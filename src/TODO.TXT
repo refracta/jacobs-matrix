@@ -2,6 +2,21 @@
 - more rooms
 - lost avatar on restart?
 
+100% cpu usage due to no sleeping when awaiting a key.o
+
+Does not create empty console window
+  Fixed in 004
+
+Second portal can be accessible on the other side of the wall (Martin
+Bays)
+  Fixed in 004
+
+jacob.sh script wrong (Martin Bays)
+  Fixed in 004
+
+Build user portal debug message (Martin Bays)
+  Fixed in 004
+
 Portals show trail past mobs as they go through now.
   Fixed in 003
 

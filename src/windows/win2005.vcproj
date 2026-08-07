@@ -65,7 +65,7 @@
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="&quot;..\lib\SDL_mixer-1.2.8\lib&quot;;&quot;../lib/libtcod-1.4.0/lib&quot;"
 				GenerateDebugInformation="true"
-				SubSystem="1"
+				SubSystem="2"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -141,7 +141,7 @@
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="&quot;..\lib\SDL_mixer-1.2.8\lib&quot;;&quot;../lib/libtcod-1.4.0/lib&quot;"
 				GenerateDebugInformation="true"
-				SubSystem="1"
+				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				TargetMachine="1"

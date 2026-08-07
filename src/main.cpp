@@ -1059,8 +1059,13 @@ loadWorld()
 }
 
 
+#ifdef WIN32
+int WINAPI
+WinMain(HINSTANCE hINstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCMdSHow)
+#else
 int 
 main(int argc, char **argv)
+#endif
 {
     bool		done = false;
 

@@ -1038,10 +1038,10 @@ MOB::buildPortalAtLocation(POS vpos, int portal) const
     // Verify the portal is well formed, ie, three neighbours are now
     // walls and the other is a floor.
     int		dir, floordir = -1;
+    TILE_NAMES	tile;
 
     for (dir = 0; dir < 4; dir++)
     {
-	TILE_NAMES		tile;
 	tile = vpos.delta4Direction(dir).tile();
 	if (tile == TILE_FLOOR)
 	{
@@ -1069,7 +1069,33 @@ MOB::buildPortalAtLocation(POS vpos, int portal) const
     if (floordir < 0)
 	return false;
 
-    cerr << "Build user portal dir " << floordir << endl;
+    // In floordir+2 we will be placing the mirror of the opposite
+    // portal.  It is important that square is not accessible.  We
+    // merely make sure it isn't a floor
+    // Still an issue of having ants dig it out.  Ideally we'd
+    // have the virtual portal flagged with MAPFLAG_PORTAL but
+    // we don't do that currently in buildPortal and doing so
+    // would mean we'd have to clean it up properly.
+
+    POS		virtualportal;
+
+    virtualportal = vpos.delta4Direction((floordir+2)&3);
+    virtualportal = virtualportal.delta4Direction((floordir+2)&3);
+
+    // We now point to the square behind the proposed virtual portal
+    // this should be wall or invalid
+    tile = virtualportal.tile();
+    if (tile != TILE_WALL && tile != TILE_PROTOPORTAL && tile != TILE_INVALID)
+	return false;
+    // Try neighbours.
+    tile = virtualportal.delta4Direction((floordir+1)&3).tile();
+    if (tile != TILE_WALL && tile != TILE_PROTOPORTAL && tile != TILE_INVALID)
+	return false;
+    tile = virtualportal.delta4Direction((floordir-1)&3).tile();
+    if (tile != TILE_WALL && tile != TILE_PROTOPORTAL && tile != TILE_INVALID)
+	return false;
+
+    // We now know we aren't an isolated island.  Yet.
 
     vpos.map()->buildUserPortal(vpos, portal, (floordir+2) & 3);
     return true;
