@@ -15,7 +15,11 @@
 
 #ifdef LINUX
 #include "thread_linux.h"
+#ifdef __EMSCRIPTEN__
+#include <emscripten/threading.h>
+#else
 #include <sys/sysinfo.h>
+#endif
 #else
 #include "thread_win.h"
 #endif
@@ -38,7 +42,11 @@ THREAD::numProcessors()
     if (nproc < 0)
     {
 #ifdef LINUX
+#ifdef __EMSCRIPTEN__
+	nproc = emscripten_num_logical_cores();
+#else
 	nproc = get_nprocs_conf();
+#endif
 #else
 	SYSTEM_INFO		sysinfo;
 	GetSystemInfo(&sysinfo);
@@ -82,7 +90,7 @@ LOCK::LOCK()
 {
 #ifdef LINUX
     pthread_mutexattr_init(&myLockAttr);
-    pthread_mutexattr_settype(&myLockAttr, PTHREAD_MUTEX_RECURSIVE_NP);
+    pthread_mutexattr_settype(&myLockAttr, PTHREAD_MUTEX_RECURSIVE);
     pthread_mutex_init(&myLock, &myLockAttr);
 #else
     myLock = new CRITICAL_SECTION;

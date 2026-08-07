@@ -386,7 +386,7 @@ FIRE::mainLoop()
     float	decayrate;
     float	timetotop = 2.0;
     float	v, noise;
-    float	np[2];
+    float	np[3];
     
     int		x, y;
     int		seedstarty;

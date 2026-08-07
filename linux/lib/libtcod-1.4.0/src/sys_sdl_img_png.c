@@ -65,7 +65,7 @@ SDL_Surface *TCOD_sys_read_png(const char *filename) {
 	if (info_ptr == NULL)
 	{
 		fclose(fp);
-		png_destroy_read_struct(&png_ptr, png_infopp_NULL, png_infopp_NULL);
+		png_destroy_read_struct(&png_ptr, NULL, NULL);
 		return NULL;
 	}
 
@@ -77,7 +77,7 @@ SDL_Surface *TCOD_sys_read_png(const char *filename) {
 	if (setjmp(png_jmpbuf(png_ptr)))
 	{
 		/* Free all of the memory associated with the png_ptr and info_ptr */
-		png_destroy_read_struct(&png_ptr, &info_ptr, png_infopp_NULL);
+		png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
 		fclose(fp);
 		/* If we get here, we had a problem reading the file */
 		return NULL;
@@ -105,6 +105,12 @@ SDL_Surface *TCOD_sys_read_png(const char *filename) {
 	png_set_packing(png_ptr); // 1,2,4 bits depth => 24/32 bits depth
 	if ( png_color_type == PNG_COLOR_TYPE_GRAY ) png_set_expand(png_ptr); // grayscale => color
 	if ( png_color_type == PNG_COLOR_TYPE_GRAY_ALPHA ) png_set_gray_to_rgb(png_ptr);
+#ifdef __EMSCRIPTEN__
+	/* Emscripten's SDL 1 surfaces are always RGBA, even when a 24-bit
+	 * surface is requested.  Expand RGB PNGs so each decoded pixel matches
+	 * the four-byte SDL pitch. */
+	if ( png_color_type == PNG_COLOR_TYPE_RGB ) png_set_filler(png_ptr, 0xff, PNG_FILLER_AFTER);
+#endif
 
 	// update the image information
 	png_read_update_info(png_ptr,info_ptr);
@@ -112,7 +118,18 @@ SDL_Surface *TCOD_sys_read_png(const char *filename) {
 		&png_interlace_type,NULL,NULL);
 
 	// create the SDL surface
-	bitmap=TCOD_sys_get_surface(png_width,png_height,info_ptr->channels == 4);
+	bitmap=TCOD_sys_get_surface(png_width,png_height,png_get_channels(png_ptr,info_ptr) == 4);
+
+#ifdef __EMSCRIPTEN__
+	/* Emscripten's SDL surface has a Canvas backing store.  Lock it before
+	 * writing pixels directly, then unlock after the PNG data is copied so
+	 * the Canvas receives the new bitmap. */
+	if ( SDL_LockSurface(bitmap) < 0 ) {
+		png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
+		fclose(fp);
+		return NULL;
+	}
+#endif
 
 	// get row data
 	row_pointers=(png_bytep *)malloc(sizeof(png_bytep)*png_height);
@@ -123,8 +140,12 @@ SDL_Surface *TCOD_sys_read_png(const char *filename) {
 	// read png data directly into the SDL surface
 	png_read_image(png_ptr,row_pointers);
 
+#ifdef __EMSCRIPTEN__
+	SDL_UnlockSurface(bitmap);
+#endif
+
 	/* clean up after the read, and free any memory allocated - REQUIRED */
-	png_destroy_read_struct(&png_ptr, &info_ptr, png_infopp_NULL);
+	png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
 	free(row_pointers);
 
 	/* close the file */
@@ -153,14 +174,14 @@ void TCOD_sys_write_png(const SDL_Surface *surf, const char *filename) {
 	if (info_ptr == NULL)
 	{
 		fclose(fp);
-		png_destroy_write_struct(&png_ptr, png_infopp_NULL);
+		png_destroy_write_struct(&png_ptr, NULL);
 		return;
 	}
 
 	if (setjmp(png_jmpbuf(png_ptr)))
 	{
 		/* Free all of the memory associated with the png_ptr and info_ptr */
-		png_destroy_read_struct(&png_ptr, &info_ptr, png_infopp_NULL);
+		png_destroy_write_struct(&png_ptr, &info_ptr);
 		fclose(fp);
 		/* If we get here, we had a problem reading the file */
 		return;

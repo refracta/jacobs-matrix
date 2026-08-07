@@ -141,6 +141,7 @@ public:
 	    val = peek;
 	    peek = exchange(val);
 	}
+	return val;
     }
 
     void	set(s32 val) { myValue = val; }
@@ -150,7 +151,7 @@ private:
     s32		myValue;
 
     ATOMIC_INT32(const ATOMIC_INT32 &) {}
-    ATOMIC_INT32 &operator=(const ATOMIC_INT32 &) {}
+    ATOMIC_INT32 &operator=(const ATOMIC_INT32 &) { return *this; }
 };
 
 
@@ -169,7 +170,7 @@ public:
 
 protected:
     LOCK(const LOCK &) {}
-    LOCK &operator=(const LOCK &) {}
+    LOCK &operator=(const LOCK &) { return *this; }
 
 #ifdef LINUX
     pthread_mutex_t	 myLock;
@@ -208,7 +209,7 @@ public:
 private:
 
     CONDITION(const CONDITION &) {}
-    CONDITION &operator=(const CONDITION &) {}
+    CONDITION &operator=(const CONDITION &) { return *this; }
 
 #ifdef LINUX
     pthread_cond_t	myCond;

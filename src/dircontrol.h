@@ -14,6 +14,7 @@
 
 #ifdef LINUX
 #include <dirent.h>
+#include <limits.h>
 #else
 #include <windows.h>
 #endif

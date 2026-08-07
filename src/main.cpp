@@ -36,6 +36,13 @@
 #include <fstream>
 using namespace std;
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#define JACOB_SAVE_PATH "/save/jacob.sav"
+#else
+#define JACOB_SAVE_PATH "jacob.sav"
+#endif
+
 int		 glbLevelStartMS = -1;
 
 #include "rand.h"
@@ -81,6 +88,8 @@ stopMusic()
 void
 startMusic()
 {
+    int playResult = -2;
+
     if (glbMusicActive)
 	stopMusic();
 
@@ -99,12 +108,26 @@ startMusic()
 
 	if (glbConfig->musicEnable())
 	{
-	    Mix_PlayMusic(glbTunes, 0);
+	    playResult = Mix_PlayMusic(glbTunes, 0);
+	    if (playResult)
+	    {
+		printf("Failed to play music, error %s\n", Mix_GetError());
+		glbMusicActive = false;
+	    }
 	    Mix_HookMusicFinished(endOfMusic);
 
 	    setMusicVolume(glbMusicVolume);
 	}
     }
+
+#ifdef __EMSCRIPTEN__
+    MAIN_THREAD_EM_ASM({
+	globalThis.__jacobMusicStatus = {};
+	globalThis.__jacobMusicStatus.loaded = !!$0;
+	globalThis.__jacobMusicStatus.enabled = !!$1;
+	globalThis.__jacobMusicStatus.playResult = $2;
+    }, glbTunes != 0, glbConfig->musicEnable(), playResult);
+#endif
 }
 
 
@@ -972,9 +995,9 @@ saveWorld()
 {
     // Did I mention my hatred of streams?
 #ifdef WIN32
-    ofstream	os("jacob.sav", ios::out | ios::binary);
+    ofstream	os(JACOB_SAVE_PATH, ios::out | ios::binary);
 #else
-    ofstream	os("jacob.sav");
+    ofstream	os(JACOB_SAVE_PATH);
 #endif
 
     int32		val;
@@ -1009,6 +1032,17 @@ saveWorld()
 	c = 0;
 	os.write((const char *) &c, 1);
     }
+
+#ifdef __EMSCRIPTEN__
+    os.close();
+    EM_ASM({
+	if (typeof FS !== "undefined" && FS.syncfs) {
+	    FS.syncfs(false, function(error) {
+		if (error) console.warn("Could not persist the saved game", error);
+	    });
+	}
+    });
+#endif
 }
 
 MOB *
@@ -1016,9 +1050,9 @@ loadWorld()
 {
     // Open file for reading.
 #ifdef WIN32
-    ifstream	is("jacob.sav", ios::in | ios::binary);
+    ifstream	is(JACOB_SAVE_PATH, ios::in | ios::binary);
 #else
-    ifstream	is("jacob.sav");
+    ifstream	is(JACOB_SAVE_PATH);
 #endif
 
     if (!is)
@@ -1070,9 +1104,22 @@ main(int argc, char **argv)
     bool		done = false;
 
     glbConfig = new CONFIG();
+#ifdef __EMSCRIPTEN__
+    glbConfig->load("/jacob.cfg");
+#else
     glbConfig->load("../jacob.cfg");
+#endif
 
     glbFullScreen = glbConfig->screenFull();
+
+#ifdef __EMSCRIPTEN__
+    // Browser fullscreen can only be entered in response to a user gesture.
+    glbFullScreen = false;
+    // Emscripten's SDL 1 compatibility surfaces are RGBA.  Treat the bundled
+    // black-and-white font as greyscale so libtcod builds a proper alpha mask.
+    TCODConsole::setCustomFont("terminal.png", 8, 8,
+	TCOD_FONT_LAYOUT_ASCII_INCOL | TCOD_FONT_TYPE_GREYSCALE);
+#endif
 
     // Dear Microsoft,
     // The following code in optimized is both a waste and seems designed

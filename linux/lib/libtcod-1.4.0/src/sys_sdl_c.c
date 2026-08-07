@@ -151,7 +151,7 @@ char *strcasestr (const char *haystack, const char *needle) {
 }
 #endif
 
-void TCOD_sys_map_ascii_to_font(asciiCode, fontCharX, fontCharY) {
+void TCOD_sys_map_ascii_to_font(int asciiCode, int fontCharX, int fontCharY) {
 	if ( asciiCode > 0 && asciiCode < TCOD_MAX_FONT_CHARS )
 		ascii_to_tcod[asciiCode] = fontCharX + fontCharY * fontNbCharHoriz;
 }
@@ -208,7 +208,72 @@ void TCOD_sys_console_to_bitmap(void *vbitmap, int console_width, int console_he
 	TCOD_color_t fading_color = TCOD_console_get_fading_color();
 	int fade = (int)TCOD_console_get_fade();
 	bool track_changes=(oldFade == fade && prev_console_buffer);
+#ifdef __EMSCRIPTEN__
+	/* The browser SDL compatibility layer implements blits through Canvas.
+	 * Rendering the console into the shared SDL pixel buffer in one pass is
+	 * both correct across pthread proxies and substantially cheaper than
+	 * proxying one fill and one blit for every console cell. */
+	if ( SDL_LockSurface(bitmap) < 0 ) return;
+	for (y=0; y<console_height; y++) {
+		for (x=0; x<console_width; x++) {
+			char_t *c=&console_buffer[x+y*console_width];
+			TCOD_color_t b=c->back;
+			TCOD_color_t f=c->fore;
+			int ascii=c->cf;
+			int srcx,srcy,px,py;
+
+			b.r = ((int)b.r) * fade / 255 + ((int)fading_color.r) * (255-fade)/255;
+			b.g = ((int)b.g) * fade / 255 + ((int)fading_color.g) * (255-fade)/255;
+			b.b = ((int)b.b) * fade / 255 + ((int)fading_color.b) * (255-fade)/255;
+			f.r = ((int)f.r) * fade / 255 + ((int)fading_color.r) * (255-fade)/255;
+			f.g = ((int)f.g) * fade / 255 + ((int)fading_color.g) * (255-fade)/255;
+			f.b = ((int)f.b) * fade / 255 + ((int)fading_color.b) * (255-fade)/255;
+
+			if (fontInRow) {
+				srcx=(ascii%fontNbCharHoriz)*fontWidth;
+				srcy=(ascii/fontNbCharHoriz)*fontHeight;
+			} else {
+				srcx=(ascii/fontNbCharVertic)*fontWidth;
+				srcy=(ascii%fontNbCharVertic)*fontHeight;
+			}
+
+			for (py=0; py<fontHeight; py++) {
+				for (px=0; px<fontWidth; px++) {
+					Uint8 alpha=0;
+					Uint8 *dst=(Uint8 *)bitmap->pixels
+						+ (y*fontHeight+py)*bitmap->pitch
+						+ (x*fontWidth+px)*bitmap->format->BytesPerPixel;
+					if (c->c != ' ') {
+						Uint8 *src=(Uint8 *)charmap->pixels
+							+ (srcy+py)*charmap->pitch
+							+ (srcx+px)*charmap->format->BytesPerPixel;
+						if (charmap->format->Amask)
+#ifdef __EMSCRIPTEN__
+							alpha=src[3];
+#else
+							alpha=*(src+charmap->format->Ashift/8);
+#endif
+						else if (((*(Uint32 *)src) & rgb_mask) != sdl_key)
+							alpha=255;
+					}
+					dst[0]=(f.r*alpha+b.r*(255-alpha))/255;
+					dst[1]=(f.g*alpha+b.g*(255-alpha))/255;
+					dst[2]=(f.b*alpha+b.b*(255-alpha))/255;
+					dst[3]=255;
+				}
+			}
+		}
+	}
+	SDL_UnlockSurface(bitmap);
+	oldFade=fade;
+	return;
+#endif
+#ifndef __EMSCRIPTEN__
+	/* Emscripten proxies SDL drawing operations to the browser thread.
+	 * Keeping the target surface locked while calling SDL_FillRect or
+	 * SDL_BlitSurface is rejected by its SDL 1 compatibility layer. */
 	if ( SDL_MUSTLOCK( bitmap ) && SDL_LockSurface( bitmap ) < 0 ) return;
+#endif
 	for (y=0;y<console_height;y++) {
 		for (x=0; x<console_width; x++) {
 			SDL_Rect srcRect,dstRect;
@@ -274,9 +339,13 @@ void TCOD_sys_console_to_bitmap(void *vbitmap, int console_width, int console_he
 						    	first_draw[ascii]=false;
 							sdl_fore=SDL_MapRGB(charmap->format,f.r,f.g,f.b) & rgb_mask;
 							*curtext=f;
+							#ifdef __EMSCRIPTEN__
+							if ( SDL_LockSurface(charmap) < 0 ) return;
+							#else
 							if ( SDL_MUSTLOCK(charmap) ) {
 								if ( SDL_LockSurface(charmap) < 0 ) return;
 							}
+							#endif
 
 							if ( bpp == 4 ) {
 								// 32 bits font : fill the whole character with color
@@ -313,9 +382,13 @@ void TCOD_sys_console_to_bitmap(void *vbitmap, int console_width, int console_he
 									pix = (Uint32 *) (((Uint8 *)pix)+hdelta);
 								}
 							}
+							#ifdef __EMSCRIPTEN__
+							SDL_UnlockSurface(charmap);
+							#else
 							if ( SDL_MUSTLOCK(charmap) ) {
 								SDL_UnlockSurface(charmap);
 							}
+							#endif
 						}
 						SDL_BlitSurface(charmap,&srcRect,bitmap,&dstRect);
 					}
@@ -323,7 +396,9 @@ void TCOD_sys_console_to_bitmap(void *vbitmap, int console_width, int console_he
 			}
 		}
 	}
+#ifndef __EMSCRIPTEN__
 	if ( SDL_MUSTLOCK( bitmap ) ) SDL_UnlockSurface( bitmap );
+#endif
 	oldFade=fade;
 }
 
@@ -394,7 +469,12 @@ void TCOD_sys_load_font() {
 	for (x=0; !hasTransparent && x < charmap->w; x ++ ) {
 		for (y=0;!hasTransparent && y < charmap->h; y++ ) {
 			Uint8 *pixel=(Uint8 *)(charmap->pixels) + y * charmap->pitch + x * charmap->format->BytesPerPixel;
-			Uint8 alpha=*((pixel)+charmap->format->Ashift/8);
+			Uint8 alpha;
+#ifdef __EMSCRIPTEN__
+			alpha=pixel[3];
+#else
+			alpha=*((pixel)+charmap->format->Ashift/8);
+#endif
 			if ( alpha < 255 ) {
 				hasTransparent=true;
 			}
@@ -413,9 +493,15 @@ void TCOD_sys_load_font() {
 			keyy = ((int)(' ') / fontNbCharVertic ) * fontHeight + fontHeight/2;
 		}
 		pixel=(Uint8 *)(charmap->pixels) + keyy * charmap->pitch + keyx * charmap->format->BytesPerPixel;
+#ifdef __EMSCRIPTEN__
+		fontKeyCol.r=pixel[0];
+		fontKeyCol.g=pixel[1];
+		fontKeyCol.b=pixel[2];
+#else
 		fontKeyCol.r=*((pixel)+charmap->format->Rshift/8);
 		fontKeyCol.g=*((pixel)+charmap->format->Gshift/8);
 		fontKeyCol.b=*((pixel)+charmap->format->Bshift/8);
+#endif
 		// convert greyscale to font with alpha layer
 		if ( fontIsGreyscale ) {
 			bool invert=( fontKeyCol.r > 128 ); // black on white font ?
@@ -426,16 +512,28 @@ void TCOD_sys_load_font() {
 				SDL_FreeSurface(charmap);
 				charmap=temp;
 			}
+#ifdef __EMSCRIPTEN__
+			if ( SDL_LockSurface(charmap) < 0 ) return;
+#endif
 			for (x=0; x < charmap->w; x ++ ) {
 				for (y=0;y < charmap->h; y++ ) {
 					Uint8 *pixel=(Uint8 *)(charmap->pixels) + y * charmap->pitch + x * charmap->format->BytesPerPixel;
+#ifdef __EMSCRIPTEN__
+					Uint8 r=pixel[0];
+					pixel[3] = (invert ? 255-r : r);
+					pixel[0]=pixel[1]=pixel[2]=255;
+#else
 					Uint8 r=*((pixel)+charmap->format->Rshift/8);
 					*((pixel)+charmap->format->Ashift/8) = (invert ? 255-r : r);
 					*((pixel)+charmap->format->Rshift/8)=255;
 					*((pixel)+charmap->format->Gshift/8)=255;
 					*((pixel)+charmap->format->Bshift/8)=255;
+#endif
 				}
 			}
+#ifdef __EMSCRIPTEN__
+			SDL_UnlockSurface(charmap);
+#endif
 		} else {
 			// alpha layer not used. convert to 24 bits (faster)
 			SDL_Surface *temp=(SDL_Surface *)TCOD_sys_get_surface(charmap->w,charmap->h,false);
