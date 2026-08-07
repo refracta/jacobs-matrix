@@ -218,17 +218,11 @@ ENGINE::mainLoop()
 		break;
 	    }
 	    case ACTION_CHANGEROLE:
-	    {
-		VERIFY_ALIVE()
-		if (avatar)
-		{
-		    msg_format("You start acting like %O.  ",
-				0,
-				glb_roledefs[cmd.dx()].name);
-		    MOB::setAvatarRole((ROLE_NAMES) cmd.dx());
-		}
+		msg_format("You start acting like %O.  ",
+			    0,
+			    glb_roledefs[cmd.dx()].name);
+		MOB::setAvatarRole((ROLE_NAMES) cmd.dx());
 		break;
-	    }
 
 	    case ACTION_MANAPULSE:
 		if (avatar && avatar->alive())

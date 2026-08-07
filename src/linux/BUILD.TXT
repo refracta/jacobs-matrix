@@ -16,6 +16,9 @@ Now make sure you have SDL1.2-dev and SDL_Mixer1.2-dev packages installed.
 
 Now, build the actual app with make from this directory.
 
+You may need --march=pentium4 to get around complaints about undefined
+references to __sync_fetch_and_add_4
+
 You can run it with ./jacob.sh!
 
 Note that I just get a black screen when I try this, it seems that libtcod

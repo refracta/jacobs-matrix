@@ -4,6 +4,46 @@ COMMENT
     readable manner than raw .cpp files.
 }
 
+DEFINE OPTION
+{
+    CST		name	"None"
+}
+
+OPTION INSTRUCTIONS
+{
+    name	"Instructions"
+}
+
+OPTION PLAY
+{
+    name	"Play"
+}
+
+OPTION VOLUME
+{
+    name	"Volume"
+}
+
+OPTION FLAMEQUALITY
+{
+    name	"Flame Quality"
+}
+
+OPTION CURRENTROLE
+{
+    name	"Current Role"
+}
+
+OPTION FULLSCREEN
+{
+    name	"Toggle Full Screen"
+}
+
+OPTION QUIT
+{
+    name	"Quit"
+}
+
 DEFINE ACTION
 {
 }

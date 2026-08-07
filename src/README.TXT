@@ -30,10 +30,12 @@ each of the porting subdirectories.
 ===========================
 
 A good amount of brute force and ignorance went into the fire effects.
-You can edit the jacob.cfg file to reduce their quality.  Width
-20, height 50 will be four times faster without too much quality
-change.  Alternatively, set the width to 0 to disable flames entirely,
-probably a good idea if you don't have a multi-core box.
+You can edit the jacob.cfg file to reduce their quality.  Reduce the
+flame quality in the options menu to speed things up.  Alternatively,
+edit the jacob.cfg file and change the flame width and height.  A
+width of 20, height of 50, will be four times faster without too much
+quality change.  Alternatively, set the width to 0 to disable flames
+entirely, probably a good idea if you don't have a multi-core box.
 
 ===========================
   HOW TO PLAY
@@ -56,6 +58,7 @@ can also use the cursor keys for four way movement.
    Q - Quit
    D - Drop Weapon and Spellbook
    R - Restart Level
+   m - Map
    x - Look Around
    w - Change Behaviour
    v - Declare Victory
@@ -63,6 +66,8 @@ can also use the cursor keys for four way movement.
    a - About Jacob's Matrix
    P - Toggle Fullscreen
    ? - This Help
+   P - Toggle Fullscreen
+   O - Options
      - Wait
 
 ===========================
@@ -98,8 +103,37 @@ dungeon.  With the Doryen Library moving me into the real-time
 mindset, I decided to make a roguelike which, while still turn based,
 had a realtime component.  I decided to aim for a frantic paced
 roguelike where you type as fast as you can to try and win.  This
-meant keeping the interface as streamlined as possible - all the
-essential controls are available on the number pad.
+meant keeping the interface as streamlined as possible.  Decisions
+such as which weapon or spellbook to keep was replaced by just setting
+the adventurer's preference rather than trying to judge the quality of
+each choice.  Potions and equipment are all instantly consumed.  The
+required keys were minimized and fit on the number pad.  The player
+can then focus on navigation and crowd control.
+
+The Jacobian ended up an important part of the theme of the game.
+Because of the way the rooms were randomly stitched together, a simple
+compass can't be used to point players in the right direction as it
+could be that both moving left a room and moving right a room both
+bring the player closer to the destination.  The colour of the room
+can be seen as the vector-output of the function on the current room.
+If we make this function locally orientable from the screen-space, we
+can easily define the Jacobian which will tell the user how to get the
+colours more "yellow", ie, maximize red and green.  The last sentence
+is of no use to anyone who hasn't already figured out how the
+Jacobian works.  Note that +Y is Down, as per standard screen space,
+and contrary to usual mathematical convention.
+
+===========================
+  CREDITS
+===========================
+
+This section is not complete without mentioning quasist, whose music
+forms the backbone of this game.
+
+Thanks to Physics for reproting the yellow light bug.  Thanks to Martin Bays
+for pointing out that shooting yourself was not properly handled and
+providing valuable feedback in how to better reveal the jacobian and
+polish the portal throwing code.
 
 ===========================
   FINAL IMPORTANT NOTE

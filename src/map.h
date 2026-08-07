@@ -81,7 +81,7 @@ public:
 
     /// Returns the last valid pos before we hit a wall, if stop
     /// before wall set.  Otherwise returns the wall hit.
-    POS		 traceBulletPos(int range, int dx, int dy, bool stopbeforewall) const;
+    POS		 traceBulletPos(int range, int dx, int dy, bool stopbeforewall, bool stopatmob = true) const;
 
     void	 fireball(MOB *caster, int rad, DPDF dpdf, u8 sym, ATTR_NAMES attr) const;
 
@@ -146,6 +146,9 @@ public:
     // pointer.
     u8		*color() const;
     int		*jacobian() const;
+
+    // Use with much discretion!
+    int		 roomId() const { return myRoomId; }
 
 
 private:

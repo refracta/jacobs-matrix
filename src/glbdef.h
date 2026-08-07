@@ -572,4 +572,30 @@ enum ACTION_NAMES
     for ((x) = (ACTION_NAMES) 0; \
          (x) < NUM_ACTIONS; \
          (x) = (ACTION_NAMES) ((int)(x)+1))
+
+// Definitions for OPTION
+enum OPTION_NAMES
+{
+    OPTION_INSTRUCTIONS,
+    OPTION_PLAY,
+    OPTION_VOLUME,
+    OPTION_FLAMEQUALITY,
+    OPTION_CURRENTROLE,
+    OPTION_FULLSCREEN,
+    OPTION_QUIT,
+    NUM_OPTIONS
+};
+
+// Macros for OPTION
+#define FOREACH_OPTION(x) \
+    for ((x) = (OPTION_NAMES) 0; \
+         (x) < NUM_OPTIONS; \
+         (x) = (OPTION_NAMES) ((int)(x)+1))
+
+struct OPTION_DEF
+{
+    const char *name;
+};
+
+extern const OPTION_DEF glb_optiondefs[];
 #endif

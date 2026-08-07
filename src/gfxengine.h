@@ -72,6 +72,8 @@ void gfx_getString(int x, int y, ATTR_NAMES attr, char *buf, int maxlen);
 void gfx_printchar(int x, int y, u8 c, ATTR_NAMES attr);
 // Uses black background.
 void gfx_printchar(int x, int y, u8 c, u8 r, u8 g, u8 b);
+// Fully specify
+void gfx_printchar(int x, int y, u8 c, u8 r, u8 g, u8 b, u8 br, u8 bg, u8 bb);
 void gfx_printattr(int x, int y, ATTR_NAMES attr);
 
 #endif

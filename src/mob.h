@@ -116,6 +116,8 @@ public:
     void		 addItem(ITEM *item);
     void		 removeItem(ITEM *item, bool quiet = false);
 
+    void		 loseTempItems();
+
     void		 clearBoredom() { myBoredom = 0; }
 
     //
@@ -192,6 +194,8 @@ public:
 
     void		 getVisibleEnemies(PTRLIST<MOB *> &list) const;
     bool		 hasVisibleEnemies() const;
+
+    bool		 buildPortalAtLocation(POS vpos, int portal) const;
     
 protected:
     MOB();

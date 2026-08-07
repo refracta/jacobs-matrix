@@ -301,6 +301,14 @@ gfx_printchar(int x, int y, u8 c, u8 r, u8 g, u8 b)
 
 
 void 
+gfx_printchar(int x, int y, u8 c, u8 r, u8 g, u8 b, u8 br, u8 bg, u8 bb)
+{
+    TCODConsole::root->setBack(x, y, TCODColor(br, bg, bb));
+    TCODConsole::root->setFore(x, y, TCODColor(r, g, b));
+    TCODConsole::root->setChar(x, y, c);
+}
+
+void 
 gfx_getString(int x, int y, ATTR_NAMES attr, char *buf, int maxlen)
 {
     strcpy(buf, "Not Implemented!");

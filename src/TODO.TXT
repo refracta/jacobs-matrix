@@ -1,3 +1,19 @@
 - flood fill colours for more uniform jacobian
 - more rooms
 - lost avatar on restart?
+
+Martin Bays: - Fuzzy portal firing. ignore mobs 
+    Fixed in - 002
+Martin Bays - Some hint of the map showing blue -> yellow with correct
+orientation so users can figure out jacobian
+    Fixed in 002 with the map.
+
+
+- Reported by Physics: yellow light blind survives death
+  - Fixed 002
+
+- Martin Bays: Shooting yourself brings up unable to fined foo:foo
+  - Fixed 002
+
+Option menu
+ - Added in 002

@@ -380,6 +380,11 @@ MOB::applyDamage(MOB *src, int hits)
 	// Note that avatar doesn't actually die...
 	if (!isAvatar())
 	    delete this;
+	else
+	{
+	    // Make sure we drop our blind attribute..
+	    loseTempItems();
+	}
 	return true;
     }
 
@@ -938,29 +943,75 @@ MOB::actionPortalFire(int dx, int dy, int portal)
 			symbol, attr);
 
     POS		vpos;
-    vpos = pos().traceBulletPos(portalrange, dx, dy, false);
-
-    // We want all our portals in the same space.
-    vpos.setAngle(0);
-
-    // If it hits a mob, dissipate.
-    if (vpos.mob())
-    {
-	msg_format("The portal splashes off %S.", vpos.mob());
-	return true;
-    }
-
+    vpos = pos().traceBulletPos(portalrange, dx, dy, false, false);
+    
     if (vpos.tile() != TILE_WALL && vpos.tile() != TILE_PROTOPORTAL)
     {
 	msg_format("The portal dissipates at %O.", 0, vpos.defn().legend);
 	return true;
     }
 
+    // We want sloppy targeting for portals.
+    // This means that given a portal location of # fired at from the south,
+    // we want:
+    //
+    // 1#1
+    // 2*2
+    //
+    // as potential portals.
+    //
+    // One fired from the south-west
+    //  2
+    // 1#2
+    // *1
+
+    POS		alt[5];
+
+    if (dx && dy)
+    {
+	alt[0] = vpos;
+	alt[1] = vpos.delta(-dx, 0);
+	alt[2] = vpos.delta(0, -dy);
+	alt[3] = vpos.delta(0, dy);
+	alt[4] = vpos.delta(dx, 0);
+    }
+    else if (dx)
+    {
+	alt[0] = vpos;
+	alt[1] = vpos.delta(0, 1);
+	alt[2] = vpos.delta(0, -1);
+	alt[3] = vpos.delta(-dx, 1);
+	alt[4] = vpos.delta(-dx, -1);
+    }
+    else
+    {
+	alt[0] = vpos;
+	alt[1] = vpos.delta(1, 0);
+	alt[2] = vpos.delta(-1, 0);
+	alt[3] = vpos.delta(1, -dy);
+	alt[4] = vpos.delta(-1, -dy);
+    }
+
+    for (int i = 0; i < 5; i++)
+    {
+	if (buildPortalAtLocation(alt[i], portal))
+	    return true;
+    }
+    msg_report("The wall proved too unstable to hold a portal.");
+
+    return true;
+}
+
+bool
+MOB::buildPortalAtLocation(POS vpos, int portal) const
+{
+    // We want all our portals in the same space.
+    vpos.setAngle(0);
+
     // Check if it is a valid portal pos?
     if (!vpos.prepSquareForDestruction())
     {
-	msg_report("The wall proved too unstable to hold a portal.");
-	return true;
+	return false;
     }
 
     // Verify the portal is well formed, ie, three neighbours are now
@@ -978,8 +1029,7 @@ MOB::actionPortalFire(int dx, int dy, int portal)
 	    else
 	    {
 		// Uh oh.
-		msg_report("The wall proved too unstable to hold a portal.");
-		return true;
+		return false;
 
 	    }
 	}
@@ -990,15 +1040,14 @@ MOB::actionPortalFire(int dx, int dy, int portal)
 	else
 	{
 	    // Uh oh.
-	    msg_report("The wall proved too unstable to hold a portal.");
-	    return true;
+	    return false;
 	}
     }
 
     vpos.map()->buildUserPortal(vpos, portal, (floordir+2) & 3);
-
     return true;
 }
+
 
 bool
 MOB::actionWalk(int dx, int dy)
@@ -1209,6 +1258,24 @@ MOB::removeItem(ITEM *item, bool quiet)
 			this, item);
 
     myInventory.removePtr(item);
+}
+
+void
+MOB::loseTempItems()
+{
+    int		i;
+    ITEM	*item;
+
+    for (i = myInventory.entries(); i --> 0;)
+    {
+	item = myInventory(i);
+	if (item->getTimer() >= 0)
+	{
+	    // All timed items are temporary.
+	    removeItem(item, true);
+	    delete item;
+	}
+    }
 }
 
 void

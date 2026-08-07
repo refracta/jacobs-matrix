@@ -3155,3 +3155,30 @@ glb_attrdefs[NUM_ATTRS] =
     false,
   },
 };
+
+// Definitions for OPTION
+const OPTION_DEF
+glb_optiondefs[NUM_OPTIONS] =
+{
+  {
+    "Instructions",
+  },
+  {
+    "Play",
+  },
+  {
+    "Volume",
+  },
+  {
+    "Flame Quality",
+  },
+  {
+    "Current Role",
+  },
+  {
+    "Toggle Full Screen",
+  },
+  {
+    "Quit",
+  },
+};

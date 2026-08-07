@@ -37,6 +37,7 @@ CONFIG::load(const char *fname)
     music = parser.newStructure("music");
     music->addProperty("enable", TCOD_TYPE_BOOL, true);
     music->addProperty("file", TCOD_TYPE_STRING, true);
+    music->addProperty("volume", TCOD_TYPE_INT, true);
 
     screen = parser.newStructure("screen");
     screen->addProperty("full", TCOD_TYPE_BOOL, true);
@@ -48,6 +49,7 @@ CONFIG::load(const char *fname)
 
     myMusicEnable = parser.getBoolProperty("music.enable");
     myMusicFile = parser.getStringProperty("music.file");
+    myMusicVolume = parser.getIntProperty("music.volume");
 
     myFullScreen = parser.getBoolProperty("screen.full");
 }

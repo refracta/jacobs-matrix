@@ -64,7 +64,7 @@ welcome::You7
 welcome::You8
     You are in a maze of twisty little passages, all different.
 
-    The ritual is now familiar to you: get to the gold room.  The likeliehood
+    The ritual is now familiar to you: get to the gold room.  The likelihood
     of you reading this text is inversely proportional to the number of times
     you have to read it because you have to restart the level.
 
@@ -85,7 +85,7 @@ welcome::You10
     You are in a twisting maze of little passages, all different.
 
     You blink your eyes.  Colour still floats in front of them, relics of your
-    constant strain to distinguish slighly different hues.  This challenge
+    constant strain to distinguish slightly different hues.  This challenge
     represents the last, however.  After this you can brag of your superior
     abilities.
 
@@ -98,36 +98,50 @@ welcome::You11
     your life!  The gold room has been found more than enough times.  In any
     case, this level is likely entirely impossible anyways.
 
+fire::You
+    Hey!  That is you on the other side of that portal!
+
 # Game commands are the general overall commands.
 game::help
-    Travel to the gold room.  Try not to die.  When music ends, so do you.
+    Travel to the gold room.  Try not to die.  When the music ends, so do you.
     But remember this is a turn based game!
 
-    Movement is done with the number pad or with vi style keys.  You 
-    can also use the cursor keys for four way movement.
-        7 8 9  y k u
-         \|/    \|/
-        4-5-6  h-.-l
-         /|\    /|\
-        1 2 3  b j n
+    When you are dead and awaiting revival is a good time to e'x'amine your
+    opponents, look at the 'm'ap, or change 'w'hich sort of items you prefer.
+
+    You can move with the number pad or with vi-style keys.  You 
+    can also use the cursor keys for four way movement.  Walking into creatures
+    will attack them.
+
+       8-way Movement Keys
+
+         7 8 9     y k u
+          \|/       \|/
+         4-5-6     h-.-l
+          /|\       /|\
+         1 2 3     b j n
+
+
 
      Command Keys:
        f,0 - Cast Spell
-       e,/ - Rotate Map Left
-       r,* - Rotate Map Right
        t,- - Orange Portal
        g,+ - Blue Portal
+       x - Look Around
+       m - Map
+       w - Change Behaviour
+       e,/ - Rotate Map Left
+       r,* - Rotate Map Right
        Q - Quit
        D - Drop Weapon and Spellbook
        R - Restart Level
-       x - Look Around
-       w - Change Behaviour
        v - Declare Victory
        z - Welcome Message
        a - About Jacob's Matrix
-       ? - This Help
        P - Toggle Fullscreen
+       O - Options
          - Wait
+       ? - This Help
 
 game::lose
     The song ends, and so do you!
@@ -138,7 +152,7 @@ game::lose
     Remember that you can create portals.
 
     If you don't know why rotating the map is a good idea, perhaps do some
-    research on the jacobian.
+    research on the Jacobian.
 
     May the Jacobian be with you!
 
@@ -176,7 +190,7 @@ game::victory6
 
 game::victory7
     Hurrah!  A very good job to make it this far.  The dungeons are getting
-    very long and very twisty.  You have obviuosly learned some smart
+    very long and very twisty.  You have obviously learned some smart
     navigation tricks.  Have you considered sharing them with others?
 
 game::victory8
@@ -269,7 +283,7 @@ mob::frog
 mob::ghost
     The uneasy dead wander the halls as mere shades of their former
     selves.  The shock of turning a corner and seeing a ghost suddenly
-    in front of you is great - but the fear is unwaranted, for in this
+    in front of you is great - but the fear is unwarranted, for in this
     case, the dead cannot harm the living.
 
 mob::horse
@@ -365,7 +379,7 @@ mob::ape
 
 mob::polar bear
     The polar bear, escaping from the dwindling arctic pack ice, seems to
-    have come underground.  The strong consitution of the polar bear
+    have come underground.  The strong constitution of the polar bear
     make it a formidable foe.
 
 mob::centaur

@@ -48,9 +48,24 @@ int		 glbLevelStartMS = -1;
 Mix_Music		*glbTunes = 0;
 bool			 glbMusicActive = false;
 
+// Cannot be bool!
+// libtcod does not accept bools properly.
+int			glbFullScreen = false;
+int			glbMusicVolume = 10;
+
 void endOfMusic()
 {
     glbMusicActive = false;
+}
+
+void
+setMusicVolume(int volume)
+{
+    volume = BOUND(volume, 0, 10);
+
+    glbMusicVolume = volume;
+
+    Mix_VolumeMusic((MIX_MAX_VOLUME * volume) / 10);
 }
 
 void
@@ -86,6 +101,8 @@ startMusic()
 	{
 	    Mix_PlayMusic(glbTunes, 0);
 	    Mix_HookMusicFinished(endOfMusic);
+
+	    setMusicVolume(glbMusicVolume);
 	}
     }
 }
@@ -127,6 +144,7 @@ int		 glbLevel = 1;
 int		 glbMaxLevel = 0;
 PTRLIST<int>	 glbLevelTimes;
 bool		 glbVeryFirstRun = true;
+bool		 glbDrawMap = false;
 
 CHOOSER		*glbRoleChooser = 0;
 CHOOSER		*glbRoleStats = 0;
@@ -159,6 +177,73 @@ mstotime(int ms)
 	buf.sprintf("0.%03ds", ms);
 
     return buf;
+}
+
+void
+drawMap(MAP *map)
+{
+    if (!map) return;
+
+    MOB 	*avatar = map->avatar();
+
+    if (!avatar)
+	return;
+    
+    POS		pos = avatar->pos();
+    int		rw, rh;
+
+    rw = map->getDepth() + 2;
+    rh = map->getDepth() + 2;
+
+    int		rx = pos.roomId() % rw;
+    int		ry = pos.roomId() / rw;
+
+    int		x, y;
+
+    // Note that we flip x/y when we render this map.
+    // This is because we made the first column of the jacobian
+    // dr, the second dg.  The first column in the map should be the
+    // x axis and second y axis, but we vary red by ry, not green, so
+    // we have to swap to match expectations.
+    // 
+    // Likewise, note that +y is down, this conforms to the game's space
+    // with the jacobian where +y is down.
+
+    for (y = -10; y <= 10; y++)
+    {
+	for (x = -10; x <= 10; x++)
+	{
+	    if (ABS(x) == 10 || ABS(y) == 10)
+	    {
+		// Border.
+		gfx_printchar(40 + x, 25 + y, ' ',
+				0, 0, 0,
+				200, 160, 80);
+	    }
+	    else if (rx + x < 0 || rx + x >= rw ||
+		     ry + y < 0 || ry + y >= rh)
+	    {
+		// Out of bounds.
+		gfx_printchar(40 + y, 25 + x, ' ',
+				0, 0, 0);
+	    }
+	    else if (x == 0 && y == 0)
+	    {
+		gfx_printchar(40 + y, 25 + x, '#',
+				(u8) (((ry+y) / (float)(rh-1)) * 255),
+				(u8) (((rx+x) / (float)(rw-1)) * 255),
+				(u8) (255 - 255*((rx+x+ry+y) / (float)(rw+rh-2))),
+				255, 255, 255);
+	    }
+	    else
+	    {
+		gfx_printchar(40 + y, 25 + x, '#',
+				(u8) (((ry+y) / (float)(rh-1)) * 255),
+				(u8) (((rx+x) / (float)(rw-1)) * 255),
+				(u8) (255 - 255*((rx+x+ry+y) / (float)(rw+rh-2))));
+	    }
+	}
+    }
 }
 
 // Should call this in all of our loops.
@@ -317,6 +402,9 @@ redrawWorld()
     if (glbDeathTS >= 0)
 	glbDeathInfo->redraw();
 
+    if (glbDrawMap)
+	drawMap(glbMap);
+
     if (isvictory)
 	glbVictoryInfo->redraw();
 
@@ -336,15 +424,15 @@ redrawWorld()
 	gfx_printattr(glbInvertX, glbInvertY, ATTR_HILITE);
     }
 
+    if (glbLevelActive)
+    {
+	glbLevelChooser->redraw();
+    }
+
     if (glbRoleActive)
     {
 	glbRoleChooser->redraw();
 	glbRoleStats->redraw();
-    }
-
-    if (glbLevelActive)
-    {
-	glbLevelChooser->redraw();
     }
 
     if (glbPopUpActive)
@@ -561,15 +649,197 @@ doExamine()
 }
 
 void
-reloadLevel(int depth)
+buildOptionsMenu(OPTION_NAMES d)
 {
-    glbDeathCount = 0;
-    glbRebootCount = 0;
-    glbLastManaTS = -1;
+    OPTION_NAMES	option;
+    glbLevelChooser->clear();
 
+    glbLevelChooser->setTextAttr(ATTR_NORMAL);
+    FOREACH_OPTION(option)
+    {
+	glbLevelChooser->appendChoice(glb_optiondefs[option].name);
+    }
+    glbLevelChooser->setChoice(d);
+
+    glbLevelActive = true;
+}
+
+bool
+optionsMenu()
+{
+    int			key;
+    bool		done = false;
+
+    buildOptionsMenu(OPTION_INSTRUCTIONS);
+
+    // Run the chooser...
+    while (!TCODConsole::isWindowClosed())
+    {
+	redrawWorld();
+	key = gfx_getKey(false);
+
+	glbLevelChooser->processKey(key);
+
+	if (key)
+	{
+	    // User selects this?
+	    if (key == '\n' || key == ' ')
+	    {
+		if (glbLevelChooser->getChoice() == OPTION_INSTRUCTIONS)
+		{
+		    // Instructions.
+		    popupText(text_lookup("game", "help"));
+		}
+		else if (glbLevelChooser->getChoice() == OPTION_PLAY)
+		{
+		    // Play...
+		    break;
+		}
+		else if (glbLevelChooser->getChoice() == OPTION_VOLUME)
+		{
+		    int			i;
+		    BUF			buf;
+		    // Volume
+		    glbLevelChooser->clear();
+
+		    for (i = 0; i <= 10; i++)
+		    {
+			buf.sprintf("%3d%% Volume", (10 - i) * 10);
+
+			glbLevelChooser->appendChoice(buf);
+		    }
+		    glbLevelChooser->setChoice(10 - glbMusicVolume);
+
+		    while (!TCODConsole::isWindowClosed())
+		    {
+			redrawWorld();
+			key = gfx_getKey(false);
+
+			glbLevelChooser->processKey(key);
+
+			setMusicVolume(10 - glbLevelChooser->getChoice());
+			if (key)
+			{
+			    break;
+			}
+		    }
+		    buildOptionsMenu(OPTION_VOLUME);
+		}
+		else if (glbLevelChooser->getChoice() == OPTION_FLAMEQUALITY)
+		{
+		    // Flame Quality
+		    int			i;
+		    BUF			buf;
+		    const char 		*quality[5] =
+		    {
+			"No Flames",
+			"Low",
+			"Middle",
+			"High",
+			"Silly"
+		    };
+
+		    int			widths[5] =
+		    {	0,
+			20,
+			40,
+			80,
+			160
+		    };
+		    int			heights[5] =
+		    {	0,
+			50,
+			100,
+			200,
+			400
+		    };
+
+		    // Flame Quality
+		    glbLevelChooser->clear();
+
+		    for (i = 0; i < 5; i++)
+		    {
+			glbLevelChooser->appendChoice(quality[i]);
+		    }
+
+		    for (i = 0; i < 5; i++)
+		    {
+			if (glbHealthFire->width() < widths[i])
+			    break;
+		    }
+		    i--;
+		    i = BOUND(i, 0, 5);
+		    glbLevelChooser->setChoice(i);
+
+		    while (!TCODConsole::isWindowClosed())
+		    {
+			bool	waskey = false;
+			redrawWorld();
+			key = gfx_getKey(false);
+
+			if (key)
+			    waskey = true;
+
+			glbLevelChooser->processKey(key);
+
+			if (key)
+			{
+			    break;
+			}
+			else if (waskey)
+			{
+			    // New selection likely, so update
+			    glbHealthFire->resize(widths[glbLevelChooser->getChoice()], heights[glbLevelChooser->getChoice()]);
+			    glbManaFire->resize(widths[glbLevelChooser->getChoice()], heights[glbLevelChooser->getChoice()]);
+			}
+		    }
+		    buildOptionsMenu(OPTION_FLAMEQUALITY);
+		}
+		else if (glbLevelChooser->getChoice() == OPTION_CURRENTROLE)
+		{
+		    // Role
+		    selectRole();
+		}
+		else if (glbLevelChooser->getChoice() == OPTION_FULLSCREEN)
+		{
+		    glbFullScreen = !glbFullScreen;
+		    // This is intentionally unrolled to work around a
+		    // bool/int problem in libtcod
+		    if (glbFullScreen)
+			TCODConsole::setFullscreen(true);
+		    else
+			TCODConsole::setFullscreen(false);
+		}
+		else if (glbLevelChooser->getChoice() == OPTION_QUIT)
+		{
+		    // Quit
+		    done = true;
+		    break;
+		}
+	    }
+	    else if (key == '\x1b')
+	    {
+		// Esc on options is to go back to play.
+		// Play...
+		break;
+	    }
+	    else
+	    {
+		// Ignore other options.
+	    }
+	}
+    }
+    glbLevelActive = false;
+
+    return done;
+}
+
+void
+buildLevelChooser(int depth)
+{
     // Request a level from the user.
     glbLevelChooser->clear();
-    int		i, key;
+    int		i;
     BUF		buf;
 
     const char 	*levelnames[10] =
@@ -626,8 +896,19 @@ reloadLevel(int depth)
 
     glbLevelChooser->setChoice(depth-1);
     glbLevelActive = true;
+}
 
 
+bool
+reloadLevel(int depth)
+{
+    int			key;
+
+    glbDeathCount = 0;
+    glbRebootCount = 0;
+    glbLastManaTS = -1;
+
+    buildLevelChooser(depth);
     // Run the chooser...
     while (!TCODConsole::isWindowClosed())
     {
@@ -648,6 +929,19 @@ reloadLevel(int depth)
 		    break;
 		}
 	    }
+	    else if (key == '\x1b')
+	    {
+		depth = glbLevelChooser->getChoice()+1;
+		// Esc on level choosing should bring us to Options.
+		if (optionsMenu())
+		{
+		    return true;
+		}
+
+		// Otherwise continue, but we have to rebuild
+		// as options dirtied the level chooser.
+		buildLevelChooser(depth);
+	    }
 	    else
 	    {
 		// Ignore other options.
@@ -657,7 +951,7 @@ reloadLevel(int depth)
     glbLevelActive = false;
 
     if (TCODConsole::isWindowClosed())
-	return;
+	return true;
 
     glbVeryFirstRun = false;
 
@@ -669,6 +963,8 @@ reloadLevel(int depth)
     popupText(text_lookup("welcome", victitle));
 
     startMusic();
+
+    return false;
 }
 
 void
@@ -768,14 +1064,10 @@ main(int argc, char **argv)
 {
     bool		done = false;
 
-    // Cannot be bool!
-    // libtcod does not accept bools properly.
-    int			fullscreen = false;
-
     glbConfig = new CONFIG();
     glbConfig->load("../jacob.cfg");
 
-    fullscreen = glbConfig->screenFull();
+    glbFullScreen = glbConfig->screenFull();
 
     // Dear Microsoft,
     // The following code in optimized is both a waste and seems designed
@@ -784,7 +1076,7 @@ main(int argc, char **argv)
     //
     // 0040BF4C  movzx       eax,byte ptr [eax+10h] 
 
-    // TCODConsole::initRoot(SCR_WIDTH, SCR_HEIGHT, "Jacob's Matrix", fullscreen);
+    // TCODConsole::initRoot(SCR_WIDTH, SCR_HEIGHT, "Jacob's Matrix", glbFullScreen);
     // 0040BF50  xor         ebp,ebp 
     // 0040BF52  cmp         eax,ebp 
     // 0040BF54  setne       cl   
@@ -793,7 +1085,7 @@ main(int argc, char **argv)
 
     // My work around is to constantify the fullscreen and hope that
     // the compiler doesn't catch on.
-    if (fullscreen)
+    if (glbFullScreen)
 	TCODConsole::initRoot(SCR_WIDTH, SCR_HEIGHT, "Jacob's Matrix", true);
     else
 	TCODConsole::initRoot(SCR_WIDTH, SCR_HEIGHT, "Jacob's Matrix", false);
@@ -805,6 +1097,8 @@ main(int argc, char **argv)
 	printf("Failed to open audio!\n");
 	exit(1);
     }
+
+    setMusicVolume(glbConfig->musicVolume());
 
     rand_setseed((long) time(0));
 
@@ -879,7 +1173,31 @@ main(int argc, char **argv)
     glbHealthFire = new FIRE(glbConfig->flameWidth(), glbConfig->flameHeight(), 20, 50, FIRE_BLACKBODY);
     glbManaFire = new FIRE(glbConfig->flameWidth(), glbConfig->flameHeight(), 20, 50, FIRE_ICE);
 
-    reloadLevel(1);
+    done = optionsMenu();
+    if (done)
+    {
+	stopMusic();
+	if (glbTunes)
+	    Mix_FreeMusic(glbTunes);
+
+	SDL_QuitSubSystem(SDL_INIT_AUDIO);
+
+	SDL_Quit();
+	return 0;
+    }
+
+    done = reloadLevel(1);
+    if (done)
+    {
+	stopMusic();
+	if (glbTunes)
+	    Mix_FreeMusic(glbTunes);
+
+	SDL_QuitSubSystem(SDL_INIT_AUDIO);
+
+	SDL_Quit();
+	return 0;
+    }
 
     do
     {
@@ -900,7 +1218,7 @@ main(int argc, char **argv)
 		    // There is a delay to restart since otherwise
 		    // they likely are hammering the keyboard at this point
 		    popupText(text_lookup("game", "lose"), 2000);
-		    reloadLevel(glbLevel);
+		    done = reloadLevel(glbLevel);
 		}
 	    }
 	}
@@ -920,7 +1238,7 @@ main(int argc, char **argv)
 		break;
 
 	    case 'R':
-		reloadLevel(glbLevel);
+		done = reloadLevel(glbLevel);
 		break;
 
 	    case '/':
@@ -939,6 +1257,10 @@ main(int argc, char **argv)
 
 	    case 'D':
 		glbEngine->queue().append(COMMAND(ACTION_DROP));
+		break;
+
+	    case 'm':
+		glbDrawMap = !glbDrawMap;
 		break;
 
 	    case '+':
@@ -999,10 +1321,10 @@ main(int argc, char **argv)
 	    }
 
 	    case 'P':
-		fullscreen = !fullscreen;
+		glbFullScreen = !glbFullScreen;
 		// This is intentionally unrolled to work around a
 		// bool/int problem in libtcod
-		if (fullscreen)
+		if (glbFullScreen)
 		    TCODConsole::setFullscreen(true);
 		else
 		    TCODConsole::setFullscreen(false);
@@ -1067,7 +1389,7 @@ main(int argc, char **argv)
 			if (glbMap->getDepth() > glbMaxLevel)
 			    glbMaxLevel = glbMap->getDepth();
 
-			reloadLevel(glbMap->getDepth()+1);
+			done = reloadLevel(glbMap->getDepth()+1);
 		    }
 		    else if (glbMap->avatar()->pos().victoryPos())
 		    {
@@ -1082,6 +1404,11 @@ main(int argc, char **argv)
 
 	    case 'x':
 		doExamine();
+		break;
+
+	    case 'O':
+	    case '\x1b':
+		done = optionsMenu();
 		break;
 	}
     } while (!done && !TCODConsole::isWindowClosed());

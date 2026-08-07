@@ -302,6 +302,7 @@ FIRE::FIRE(int w, int h, int tw, int th, FireCurve firetype)
 {
     myW = w;
     myH = h;
+    myResizePending = false;
 
     myDisableFire = false;
     if (w == 0 || h == 0)
@@ -389,7 +390,9 @@ FIRE::mainLoop()
     
     int		x, y;
     int		seedstarty;
-    FIREFIELD	temp(width(), height());
+    FIREFIELD	*temp;
+
+    temp = new FIREFIELD(width(), height());
 
     lastms = TCOD_sys_elapsed_milli();
 
@@ -400,34 +403,42 @@ FIRE::mainLoop()
 
     seedstarty = myH - 10;
 
-    if (myDisableFire)
-    {
-	while (1)
-	{
-	    ms = TCOD_sys_elapsed_milli();
-	    // Clamp this at 20fps.
-	    if (ms - lastms < 20)
-	    {
-		TCOD_sys_sleep_milli(1);
-		continue;
-	    }
-	    lastms = ms;
-	    flamesize = myFlameSize;
-
-	    // Rebuild our texture...
-	    FIRETEX		*tex;
-	    tex = new FIRETEX(myTexW, myTexH);
-	    tex->buildFromConstant(flamesize, myFireType);
-
-	    // Publish result.
-	    updateTex(tex);
-	}
-    }
-
     while (1)
     {
+	// Check if we have to rebuild everything.
+	if (myResizePending)
+	{
+	    myResizePending = false;
+	    delete myDecay;
+	    delete myHeat;
+	    delete myV[0];
+	    delete myV[1];
+	    delete temp;
+
+	    myW = myResizeW;
+	    myH = myResizeH;
+	    myDisableFire = false;
+	    if (myW == 0 || myH == 0)
+	    {
+		myW = 1;
+		myH = 1;
+		myDisableFire = true;
+	    }
+
+	    myDecay = new FIREFIELD(myW, myH);
+	    myHeat = new FIREFIELD(myW, myH);
+
+	    myV[0] = new FIREFIELD(myW, myH);
+	    myV[1] = new FIREFIELD(myW, myH);
+	    temp = new FIREFIELD(width(), height());
+	
+	    seedstarty = myH - 10;
+	    speedscale = height() / timetotop;
+	}
+
 	ms = TCOD_sys_elapsed_milli();
-	// Rather a confident test.
+
+	// Clamp this at 20fps.
 	if (ms - lastms < 10)
 	{
 	    TCOD_sys_sleep_milli(1);
@@ -437,114 +448,127 @@ FIRE::mainLoop()
 	tinc = (ms - lastms) / 1000.0F;
 	t += tinc;
 
-	// A rather important option :>
-	// Which must be done *after* calculating tinc.
-	lastms = ms;
-
 	// Noise functions get crappy to far from 0.
 	// This adds a "beat" of one minute.  Yeah!  That is why!
 	if (t > 60) t -= 60;
 
+	lastms = ms;
+
 	// Read only once as unlocked..
 	flamesize = myFlameSize;
 
-	// New decay rate is set so we hit 0 flameheight % of the way up.
-	// It will take timetoptop * flamesize to get to where we want to
-	// decay.  Clamp for flamesize < 0.01.
-	if (flamesize < 0.01)
-	    flamesize = 0.01F;
-	decayrate = 1 / (timetotop * flamesize);
-
-	// Source in our new decay & heat values.
-	FORALL_XY(x, y)
+	if (myDisableFire)
 	{
-	    if (y < seedstarty)
-		continue;
+	    // Rebuild our texture...
+	    FIRETEX		*tex;
+	    tex = new FIRETEX(myTexW, myTexH);
+	    tex->buildFromConstant(flamesize, myFireType);
 
-	    myDecay->setVal(x, y, decayrate);
-	    v = myHeat->getVal(x, y);
-	    np[0] = (5.0F*x) / myW;
-	    np[1] = (5.0F*y) / myW;	// Yes, myW.
-	    np[2] = t;	
-
-	    noise = myNoise3d->getWavelet(np) * 2.0f + 0.75f;
-
-	    // Scale noise down at sides.
-	    float 	sidescale;
-	    // 1 at edges, 0 at center
-	    sidescale = ABS(width()/2.0f - x);
-	    sidescale /= (width() * 0.35f);
-	    // make 1 at center
-	    sidescale = 1.0f - sidescale;
-	    // bounce up
-	    sidescale *= 4.0F;
-	    // Clamp
-	    if (sidescale > 1)
-		sidescale = 1;
-	    if (sidescale < 0)
-		sidescale = 0;
-
-	    noise *= sidescale;
-
-	    // Now scale at bottom
-	    sidescale = 1.0F - (myH - y) / (float)(myH - seedstarty);
-	    sidescale *= 4.0F;
-	    if (sidescale > 1)
-		sidescale = 1;
-	    noise *= sidescale;
-
-	    v = MAX(v, noise);
-	    // v = noise;
-	    myHeat->setVal(x, y, v);
+	    // Publish result.
+	    updateTex(tex);
 	}
+	else
+	{
+	    // New decay rate is set so we hit 0 flameheight % of the way up.
+	    // It will take timetoptop * flamesize to get to where we want to
+	    // decay.  Clamp for flamesize < 0.01.
+	    if (flamesize < 0.01)
+		flamesize = 0.01F;
+	    decayrate = 1 / (timetotop * flamesize);
+
+	    // Source in our new decay & heat values.
+	    FORALL_XY(x, y)
+	    {
+		if (y < seedstarty)
+		    continue;
+
+		myDecay->setVal(x, y, decayrate);
+		v = myHeat->getVal(x, y);
+		np[0] = (5.0F*x) / myW;
+		np[1] = (5.0F*y) / myW;	// Yes, myW.
+		np[2] = t;	
+
+		noise = myNoise3d->getWavelet(np) * 2.0f + 0.75f;
+
+		// Scale noise down at sides.
+		float 	sidescale;
+		// 1 at edges, 0 at center
+		sidescale = ABS(width()/2.0f - x);
+		sidescale /= (width() * 0.35f);
+		// make 1 at center
+		sidescale = 1.0f - sidescale;
+		// bounce up
+		sidescale *= 4.0F;
+		// Clamp
+		if (sidescale > 1)
+		    sidescale = 1;
+		if (sidescale < 0)
+		    sidescale = 0;
+
+		noise *= sidescale;
+
+		// Now scale at bottom
+		sidescale = 1.0F - (myH - y) / (float)(myH - seedstarty);
+		sidescale *= 4.0F;
+		if (sidescale > 1)
+		    sidescale = 1;
+		noise *= sidescale;
+
+		v = MAX(v, noise);
+		// v = noise;
+		myHeat->setVal(x, y, v);
+	    }
 
 #if 1
-	// Age the heat field by the decay field.
-	FORALL_XY(x, y)
-	{
-	    v = myHeat->getVal(x, y);
-	    v -= myDecay->getVal(x, y) * tinc;
-	    if (v < 0)
-		v = 0;
-	    myHeat->setVal(x, y, v);
-	}
+	    // Age the heat field by the decay field.
+	    FORALL_XY(x, y)
+	    {
+		v = myHeat->getVal(x, y);
+		v -= myDecay->getVal(x, y) * tinc;
+		if (v < 0)
+		    v = 0;
+		myHeat->setVal(x, y, v);
+	    }
 
-	// Calculate velocity field.
-	myV[0]->constant(0);
-	myV[1]->constant(-speedscale);
-	FORALL_XY(x, y)
-	{
-	    np[0] = (1.0F*x) / myW + 30;
-	    np[1] = (1.0F*y) / myW;	// Yes, myW.
-	    np[1] += t * speedscale;	// Effective advection.
-	    np[2] = t;
+	    // Calculate velocity field.
+	    myV[0]->constant(0);
+	    myV[1]->constant(-speedscale);
+	    FORALL_XY(x, y)
+	    {
+		np[0] = (1.0F*x) / myW + 30;
+		np[1] = (1.0F*y) / myW;	// Yes, myW.
+		np[1] += t * speedscale;	// Effective advection.
+		np[2] = t;
 
-	    noise = myNoise->getTurbulenceWavelet(np, 4) - 0.5f;
-	    v = myV[0]->getVal(x, y);
-	    v += noise * speedscale * 1.7F;
-	    myV[0]->setVal(x, y, v);
+		noise = myNoise->getTurbulenceWavelet(np, 4) - 0.5f;
+		v = myV[0]->getVal(x, y);
+		v += noise * speedscale * 1.7F;
+		myV[0]->setVal(x, y, v);
 
-	    np[0] += 30;
-	    noise = myNoise->getTurbulenceWavelet(np, 4) - 0.5f;
-	    v = myV[1]->getVal(x, y);
-	    v += noise * speedscale * 1.7F;
-	    myV[1]->setVal(x, y, v);
-	}
+		np[0] += 30;
+		noise = myNoise->getTurbulenceWavelet(np, 4) - 0.5f;
+		v = myV[1]->getVal(x, y);
+		v += noise * speedscale * 1.7F;
+		myV[1]->setVal(x, y, v);
+	    }
 
-	// Advect our fields.
-	temp = *myDecay;
-	myDecay->advect(&temp, myV, tinc);
-	temp = *myHeat;
-	myHeat->advect(&temp, myV, tinc);
+	    // Advect our fields.
+	    *temp = *myDecay;
+	    myDecay->advect(temp, myV, tinc);
+	    *temp = *myHeat;
+	    myHeat->advect(temp, myV, tinc);
 
 #endif
 
-	// Rebuild our texture...
-	FIRETEX		*tex;
-	tex = new FIRETEX(myTexW, myTexH);
-	tex->buildFromField(myHeat, myFireType);
+	    // Rebuild our texture...
+	    FIRETEX		*tex;
+	    tex = new FIRETEX(myTexW, myTexH);
+	    tex->buildFromField(myHeat, myFireType);
 
-	// Publish result.
-	updateTex(tex);
+	    // Publish result.
+	    updateTex(tex);
+	}
     }
+
+    delete temp;
 }

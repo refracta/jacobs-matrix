@@ -312,7 +312,7 @@ POS::traceBullet(int range, int dx, int dy) const
 }
 
 POS
-POS::traceBulletPos(int range, int dx, int dy, bool stopbeforewall) const
+POS::traceBulletPos(int range, int dx, int dy, bool stopbeforewall, bool stopatmob) const
 {
     if (!dx && !dy)
 	return *this;
@@ -326,7 +326,7 @@ POS::traceBulletPos(int range, int dx, int dy, bool stopbeforewall) const
 	next = next.delta(dx, dy);
 
 	// Stop at a mob.
-	if (next.mob())
+	if (stopatmob && next.mob())
 	    return next;
 
 	if (!next.defn().ispassable)

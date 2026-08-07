@@ -111,6 +111,11 @@ public:
     int			 width() const { return myW; }
     int			 height() const { return myH; }
 
+    // Yes, this is poorly locked, hopefully it doesn't rearrange
+    // our assignments on us.
+    void		 resize(int nw, int nh)
+			 { myResizeW = nw; myResizeH = nh; myResizePending = true; }
+
     void		 setFlameSize(float size);
 
     // Public only for call back conveninece.
@@ -146,6 +151,9 @@ private:
 
     // Turns into boring bar graphs.
     bool		 myDisableFire;
+
+    bool		 myResizePending;
+    int			 myResizeW, myResizeH;
 };
 
 #endif
