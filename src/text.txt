@@ -1,0 +1,487 @@
+# This is the database of text commands.
+
+# Welcome commands are sent when you first play
+# as the given character.
+
+welcome::You1
+    You are in a little twisting maze of passages, all different.
+
+    The room you stand in has blue walls.  You are convinced that if you can
+    find a room with gold walls you can find the exit.
+
+    Good luck!
+    
+    Hit '?' for a list of keyboard commands.
+
+welcome::You2
+    You are in a little maze of twisting passages, all different.
+
+    Your escape through the gold room brought you to another blue room.
+    Perhaps if you find the gold room you will get out?
+
+    Good luck!
+
+welcome::You3
+    You are in a little maze of twisty passages, all different.
+
+    Welcome to the blue room!  Somewhere there is a gold room.  Reach it!
+
+    Good luck!
+
+welcome::You4
+    You are in a little twisty maze of passages, all different.
+
+    Blue stone surrounds you.  You yearn to be surrounded by gold.
+
+    Good luck!
+
+welcome::You5
+    You are in a maze of little twisty passages, all different.
+
+    From this blue room, you must reach the gold room!  Quick now, the music
+    does not last long!
+
+    Good luck!
+
+welcome::You6
+    You are in a maze of little twisting passages, all different.
+
+    Find the red room...  Just kidding, it is still the gold room you seek.
+
+    What, exactly, does all this have to do with the gradient of a vector
+    field?
+
+    Good luck!
+
+welcome::You7
+    You are in a maze of twisting little passages, all different.
+
+    Take a deep breath.  Relax.  Because the gold room is quite far from the
+    blue room.
+
+    Good luck!
+
+welcome::You8
+    You are in a maze of twisty little passages, all different.
+
+    The ritual is now familiar to you: get to the gold room.  The likeliehood
+    of you reading this text is inversely proportional to the number of times
+    you have to read it because you have to restart the level.
+
+    Good luck!
+
+welcome::You9
+    You are in a twisting little maze of passages, all different.
+
+    Getting to the gold room is difficult.  It might even be impossible with
+    the default repeat rate on your keyboard.  But you are only two levels from
+    victory.  Stopping at this point is unthinkable.
+
+    Stretch your fingers and try again!
+
+    Good luck!
+
+welcome::You10
+    You are in a twisting maze of little passages, all different.
+
+    You blink your eyes.  Colour still floats in front of them, relics of your
+    constant strain to distinguish slighly different hues.  This challenge
+    represents the last, however.  After this you can brag of your superior
+    abilities.
+
+    Good luck!
+
+welcome::You11
+    You are in a twisty little maze of passages, all different.
+    
+    Remember, you can quit at any time now.  Do not let this obsession ruin
+    your life!  The gold room has been found more than enough times.  In any
+    case, this level is likely entirely impossible anyways.
+
+# Game commands are the general overall commands.
+game::help
+    Travel to the gold room.  Try not to die.  When music ends, so do you.
+    But remember this is a turn based game!
+
+    Movement is done with the number pad or with vi style keys.  You 
+    can also use the cursor keys for four way movement.
+        7 8 9  y k u
+         \|/    \|/
+        4-5-6  h-.-l
+         /|\    /|\
+        1 2 3  b j n
+
+     Command Keys:
+       f,0 - Cast Spell
+       e,/ - Rotate Map Left
+       r,* - Rotate Map Right
+       t,- - Orange Portal
+       g,+ - Blue Portal
+       Q - Quit
+       D - Drop Weapon and Spellbook
+       R - Restart Level
+       x - Look Around
+       w - Change Behaviour
+       v - Declare Victory
+       z - Welcome Message
+       a - About Jacob's Matrix
+       ? - This Help
+       P - Toggle Fullscreen
+         - Wait
+
+game::lose
+    The song ends, and so do you!
+
+    You can try this level again, or even retry an earlier one to see if you
+    find some nice items.  Best items are found on the latest levels, however.
+
+    Remember that you can create portals.
+
+    If you don't know why rotating the map is a good idea, perhaps do some
+    research on the jacobian.
+
+    May the Jacobian be with you!
+
+game::victory1
+    Congratulations!  You have found the gold room!
+
+    Here you find, hidden behind one of the walls, the staircase that takes you
+    to the next level.
+
+    The blue glow from the staircase gets you a bit worried, however...
+
+game::victory2
+    Aha!  The gold room!  And, sure enough, here is the exit to the next level!
+
+    Now if only you knew what that Jacobian was about.
+
+game::victory3
+    Monsters to kill and loot to pilfer, what more could you ask for?  What was
+    that?  More monsters and more loot?  Well, that is easy to arrange.
+
+game::victory4
+    The gold room, at last!
+
+    The colours are really starting to blur together now.  It is a good idea to figure out that Jacobian thingee to save strain on your eyes.
+
+game::victory5
+    Gah!  That was a tough fight you had there.
+
+    Harder fights are still to come, so gird yourself and press on!
+
+game::victory6
+    Congratulations!  You are well past half-way, at least as measured in terms
+    of levels.  In terms of rooms to crawl through?  Well, it is better not to
+    count those.
+
+game::victory7
+    Hurrah!  A very good job to make it this far.  The dungeons are getting
+    very long and very twisty.  You have obviuosly learned some smart
+    navigation tricks.  Have you considered sharing them with others?
+
+game::victory8
+    Excellent!  With this impressive achievement victory seems almost possible!
+    Remember, while the difficult increases with the square for the naive
+    explorer, for skilled spelunkers like yourself, it merely increases
+    linearly!
+
+game::victory9
+    Wow!  Level 9 conquered!
+
+    You know what this means.  Only one level left.  You can do it.  You still
+    have a few hours before you have to wake up, don't you?  Prioritize!  Sleep
+    is the enemy.  Play on!
+
+game::victory10
+    BANZAI!  BANZAI!  BANZAI!
+
+    You did it!
+
+    Against all odds, you made it across the map within the short window
+    allotted to you!
+
+    In this room you find two staircases.  One, marked 'Q' for quit, takes you
+    back into the sunshine of freedom and normal life.  The other staircase has
+    blue light coming from it.  You can still descend - if you care.
+
+game::victory11
+    Yep, we all get it.  You are a superstar.  
+    
+    Keep up the good work, and make sure you let us know how deep you get
+    before the skeleton captain eviscerates you.
+
+game::about
+    Jacob's Matrix is a Seven Day Roguelike written by Jeff Lait.
+
+    It's home on the web can be found at:
+    http://www.zincland.com/7drl/jacob
+
+    The music is Duegar Requiem by quasist, which can be found at the Rogue
+    Bard, http://roguebard.eptalys.net/song.php?id=23
+
+    It uses The Chronicles of Doryen libraries to display to the
+    screen, whose home can be found at: 
+    http://thedoryenlibrary.appspot.com/
+
+    It uses Simple DirectMedia Layer libraries to display to the
+    screen, whose home can be found at: http://www.libsdl.org/
+
+    It uses the Mersenne Twister for random number generation:
+    http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/emt.html
+
+    Questions and comments can be posted to rec.games.roguelike.misc
+    on USENET, or directly to the author at jmlait at zincland dot com.
+
+    Have fun!
+
+mob::You
+    You are an adventurer trying to get through the twisty, turny, passages,
+    all different, but under strong time constraints.
+
+mob::ant
+    The industrious ant is at home in the caves.  Of course, no home
+    is complete without some home renovation.  Ants are swift to
+    start redesigning the cavern to their liking.
+
+mob::bat
+    The erratic flight pattern of bats has often caused them to be
+    associated with madness.  However, one may be surprised to know
+    that there is a purpose behind it.
+    
+mob::cat
+    A cute little household cat prances about the cavern.
+    
+mob::dog
+    Bred to retrieve waterfowl shot by hunters, this dog is very good
+    at running straight to the fallen bird, ignoring any and all
+    distractions on the way.
+    
+mob::echidna
+    One of the few monotremes, or egg bearing mammals, the echidna has
+    the unique characteristic of having its front and back feet facing
+    in opposite directions.  Echidnas wander the caverns according to
+    desires alien to us, only posing a problem if approached too
+    closely.
+
+mob::frog
+    A lightly leaping frog hops across the cavern floor.
+
+mob::ghost
+    The uneasy dead wander the halls as mere shades of their former
+    selves.  The shock of turning a corner and seeing a ghost suddenly
+    in front of you is great - but the fear is unwaranted, for in this
+    case, the dead cannot harm the living.
+
+mob::horse
+    A large brown horse gallops through the dungeon.
+
+mob::imp
+    Small demons summoned to the mortal plane, imps live to cause
+    mischief and problems.  Their infuriating refusal to hold still
+    has caused many a stalwart fighter to scream in frustration.
+
+mob::jack rabbit
+    The innocuous jack rabbit will cause significant problems if left
+    to its own devices.  Given enough time, the dungeon will be
+    overrun with them if they are not slain swiftly.
+
+mob::kobold
+    Kobolds are small purple furred dog-like creatures.  While an
+    individual kobold poses little threat, their use of ranged weapons
+    can wear down an adventurer.
+
+mob::lichen
+    Lichen is an excellent example of a symbiotic relationship.
+    Composed of both fungus and algae living together in harmony, it
+    is often classed as a single organism by laymen.
+
+mob::mouse
+    Small white mice scurry through the caves.  Their seemingly
+    erratic movement pattern can be deciphered by the skilled mouser.
+
+mob::orc
+    The filthy blue skinned orcs are the product of some crazed mage's
+    experimentations.  Their lack of redeeming features has led to
+    them being exiled to the caverns where they lurk in the shadows.
+
+mob::newt
+    The lowly newt is the butt of many jokes.  Do not fall prey to it,
+    or the joke will be on you!
+
+mob::penguin
+    The yellow-eyed penguin is a solitary creature which keeps to
+    its nest.  It is highly territorial, however, so do not be
+    surprised if it becomes aggressive when disturbed.
+
+mob::queen bee
+    The queen bee is rarely found far from her hive.  Her powerful
+    stinger means that wise people will give her the privacy she
+    desires.
+
+mob::rat
+    Cowardly rats flee at the first sign of trouble.  Beware of
+    cornering them, however, for a cornered rat does not mind fighting
+    unfair.
+
+mob::snake
+    Fortunately, these snakes are not poisonous, and hence pose little
+    threat to a wary adventurer.
+
+mob::turtle
+    Large green turtles have formidable shells.  However, their slow
+    pace makes this not a great concern.
+
+mob::unicorn
+    A white unicorn prances playfully in the caves.
+
+mob::vampire
+    Wise people kill vampires first.  Vampires gain from your loss,
+    so, left untended, may soon become unbeatable.
+
+mob::warthog
+    The yellowed tusks of this warthog seem to be covered with blood.
+    You decide to be careful in approaching it.
+
+mob::grid bug
+    Few understand the strange dimension from which these small purple
+    x's come from.  Observant players note the artifacts in their
+    movement patterns that results from their extra-dimensional origin
+    and take advantage of it.
+
+mob::yellow light
+    Small glowing balls of light float through the caverns
+    illuminating all around them.  While the damage caused by running into
+    such a light is negligible, the tactical disadvantage of being
+    blinded is great.
+
+mob::zombie
+    An undead horror which shambles through the caves.  Its slow
+    shambling pace minimizes the threat posed by its high resistance
+    to damage.
+
+mob::ape
+    The great ape is normally a docile creature.  If disturbed,
+    however, beware its powerful claws.
+
+mob::polar bear
+    The polar bear, escaping from the dwindling arctic pack ice, seems to
+    have come underground.  The strong consitution of the polar bear
+    make it a formidable foe.
+
+mob::centaur
+    Half-human, half-horse, Centaurs are more at home to forest glades
+    than dungeon depths.  Nonetheless, their quick speed and lethal
+    arrows make them adversaries worth worrying about.
+
+mob::dragon
+    The mythical dragon is well known in literature.  Here you can see
+    it come to life, complete with a fiery breath suitable for
+    incinerating the unwise.
+
+mob::elephant
+    The last creature seen by most adventurers, the elephant is the most
+    deadly of foes, combining a tough hide with a devastating
+    trample attack.
+
+mob::fungus
+    A bright purple fungus grows fat on the remains of the fallen.  So
+    long as you continue to breathe, it poses no threat to you.
+
+mob::giant
+    Giant humanoids - twelve feet in height - they are not content to
+    throw rocks.  They throw boulders.
+
+mob::hippopotamus
+    The most deadly creature in Africa is not the lion, but the Hippo.
+    A surly temper and an unstoppable charge results in many deaths.
+    Take advantage of their short sightedness to avoid entering
+    fights.
+
+mob::icebeast
+    Ferocious creatures from the arctic wastes, beware the icey grasp
+    or find yourself frozen in your tracks.
+
+mob::jaguar
+    This member of the cat family combines powerful claws with a
+    strong constitution.  Approach with caution!
+
+mob::kleptomaniac
+    Crazed kleptomaniacs are humans that will steal anything not
+    nailed down.  Unlike normal thieves who steal for profit, it is
+    their mental condition that drives them to commit theft.
+
+mob::lich
+    Powerful wizards can make diabolical pacts with the devil to
+    return after death as a lich.  NEVER confuse these with lichen!
+
+mob::mummy
+    Powerful people in Egypt would be mummified to allow their bodies
+    to travel to the next world intact.  Some did not make it to the
+    next world - awakening instead in these caverns.  Those that
+    waken here are not very happy about the turn of events.
+
+mob::naga
+    Half-man, half-snake, the naga is a creature of nightmares.  As it
+    slithers to you, be wary of its thrown spear.  But be even more
+    wary of its powerful sword if you should engage in melee.
+
+mob::ogre
+    The malformed ogre isn't known for deep thoughts.  The biggest
+    decision an ogre faces is what to hit next with its spiked club.
+
+mob::python
+    The python is a constrictor snake that can grow to enormous
+    lengths.  This specimen is easily large enough to swallow you
+    whole!
+
+mob::quoll
+    The ferocious quoll is native to Australia where, despite its
+    powerful abilities, it is being threatened by the common cat.
+
+mob::rous
+    Native to the fireswamps, the transplanted rous can pose a problem
+    for adventurers.  A Rodent of Unusual Size, the rous can be
+    thought of as a rat.  Except bigger.
+
+mob::purple slug
+    The dreaded purple slug is a pulmonate of enormous size.  A vivid
+    purple in colour, it exudes an acidic slime that can dissolve all
+    that threaten it.
+
+mob::troll
+    Ugly trolls are usually found under bridges.  Despite the lack of
+    bridges, you have found one here.  Beware - the magical nature of
+    the troll lets it heal wounds almost as fast as you inflict them.
+
+mob::umber hulk
+    Shambling mounds of unspeakable appearance, umber hulks patrol the
+    dungeon, occasionally bashing new passage ways where none existed
+    before.
+
+mob::vampire lord
+    The dreaded vampire lord is a foe to be reckoned with.  Strike
+    fast, or find that your own health is being used against you!
+
+mob::wraith
+    Like the ghost, the wraith is a disembodied spirit haunting the
+    material world.  Unlike the ghost, it is not so easy to put to
+    rest.
+
+mob::xorn
+    The xorn originates from the elemental plane of Earth.  Its
+    affinity to that element allows it to easily pass through walls in
+    this plane.
+
+mob::yeti
+    Native to the peaks of tall mountains, the yeti can also
+    apparently be found lurking in dungeons.
+
+mob::skeleton captain
+    The chief of a skeleton army, the skeleton captain takes
+    considerable force to destroy.  In the meantime, beware of its
+    powerful arrows and deadly sword.
+
+mob::evil demon boss
+    The chief demon of this dungeon.  Surely slaying him will trigger the
+    victory conditions, letting you finally free yourself from this endless
+    cycle of saving and restoring!

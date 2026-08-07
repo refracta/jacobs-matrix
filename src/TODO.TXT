@@ -1,0 +1,3 @@
+- flood fill colours for more uniform jacobian
+- more rooms
+- lost avatar on restart?

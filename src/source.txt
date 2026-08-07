@@ -1,0 +1,2700 @@
+COMMENT
+{
+    This defines our data structures in a more maintainable and
+    readable manner than raw .cpp files.
+}
+
+DEFINE ACTION
+{
+}
+
+ACTION NONE
+ACTION RESTART
+ACTION BUMP
+ACTION FIRE
+ACTION ROTATE
+ACTION REBOOTAVATAR
+ACTION CHANGEROLE
+ACTION MANAPULSE
+ACTION DROP
+ACTION SUICIDE
+
+DEFINE ATTR
+{
+    U8		bg_r		0
+    U8		bg_g		0
+    U8		bg_b		0
+    U8		fg_r		255
+    U8		fg_g		255
+    U8		fg_b		255
+    bool	pulse		false
+}
+
+ATTR NONE
+{
+}
+
+ATTR HEALTH
+{
+    bg_r		255
+    bg_g		0
+    bg_b		0
+    fg_r		0
+    fg_g		0
+    fg_b		0
+}
+
+ATTR MANA
+{
+    bg_r		0
+    bg_g		128
+    bg_b		0
+    fg_r		255
+    fg_g		255
+    fg_b		255
+}
+
+ATTR POWERBAR
+{
+    bg_r		16
+    bg_g		96
+    bg_b		16
+    fg_r		192
+    fg_g		192
+    fg_b		192
+}
+
+ATTR BORDER
+{
+    bg_r		0
+    bg_g		0
+    bg_b		128
+    fg_r		255
+    fg_g		255
+    fg_b		255
+}
+
+ATTR VICTORYBORDER
+{
+    bg_r		128
+    bg_g		128
+    bg_b		0
+    fg_r		255
+    fg_g		255
+    fg_b		255
+}
+
+ATTR DEATHBORDER
+{
+    bg_r		64
+    bg_g		64
+    bg_b		64
+    fg_r		255
+    fg_g		255
+    fg_b		255
+}
+
+ATTR DEATHBAR
+{
+    bg_r		96
+    bg_g		32
+    bg_b		32
+    fg_r		192
+    fg_g		192
+    fg_b		192
+}
+
+ATTR INVULNERABLE
+{
+    bg_r		196
+    bg_g		196
+    bg_b		196
+    fg_r		0
+    fg_g		0
+    fg_b		0
+
+}
+
+ATTR HILITE
+{
+    bg_r		255
+    bg_g		255
+    bg_b		255
+    fg_r		0
+    fg_g		0
+    fg_b		0
+
+}
+
+ATTR ELECTRICBLUE
+{
+    bg_r		0
+    bg_g		16
+    bg_b		32
+    fg_r		32
+    fg_g		128
+    fg_b		255
+
+}
+
+ATTR METAL
+{
+    bg_r		0
+    bg_g		0
+    bg_b		0
+    fg_r		32
+    fg_g		128
+    fg_b		196
+
+}
+
+ATTR BLUEPORTAL
+{
+    bg_r		0
+    bg_g		0
+    bg_b		0
+    fg_r		20
+    fg_g		30
+    fg_b		128
+
+    pulse		true
+}
+
+ATTR ORANGEPORTAL
+{
+    bg_r		0
+    bg_g		0
+    bg_b		0
+    fg_r		128
+    fg_g		96
+    fg_b		32
+
+    pulse		true
+}
+
+ATTR YELLOW
+{
+    bg_r		0
+    bg_g		0
+    bg_b		0
+    fg_r		255
+    fg_g		255
+    fg_b		0
+
+}
+
+ATTR PURPLE
+{
+    bg_r		0
+    bg_g		0
+    bg_b		0
+    fg_r		255
+    fg_g		128
+    fg_b		255
+
+}
+
+ATTR NORMAL
+{
+    bg_r		0
+    bg_g		0
+    bg_b		0
+    fg_r		192
+    fg_g		192
+    fg_b		192
+
+}
+
+ATTR LIGHTBLACK
+{
+    bg_r		0
+    bg_g		0
+    bg_b		0
+    fg_r		96
+    fg_g		96
+    fg_b		96
+
+}
+
+ATTR OUTOFFOV
+{
+    bg_r		0
+    bg_g		0
+    bg_b		0
+    fg_r		96
+    fg_g		96
+    fg_b		96
+
+}
+
+ATTR WHITE
+{
+    bg_r		0
+    bg_g		0
+    bg_b		0
+    fg_r		255
+    fg_g		255
+    fg_b		255
+
+}
+
+ATTR ORANGE
+{
+    bg_r		0
+    bg_g		0
+    bg_b		0
+    fg_r		255
+    fg_g		192
+    fg_b		64
+
+}
+
+ATTR BROWN
+{
+    bg_r		0
+    bg_g		0
+    bg_b		0
+    fg_r		192
+    fg_g		128
+    fg_b		64
+
+}
+
+ATTR RED
+{
+    bg_r		0
+    bg_g		0
+    bg_b		0
+    fg_r		255
+    fg_g		32
+    fg_b		32
+
+}
+
+ATTR DKRED
+{
+    bg_r		0
+    bg_g		0
+    bg_b		0
+    fg_r		196
+    fg_g		32
+    fg_b		32
+
+}
+
+ATTR GREEN
+{
+    bg_r		0
+    bg_g		0
+    bg_b		0
+    fg_r		0
+    fg_g		255
+    fg_b		0
+
+}
+
+ATTR DKGREEN
+{
+    bg_r		0
+    bg_g		0
+    bg_b		0
+    fg_r		0
+    fg_g		196
+    fg_b		0
+
+}
+
+ATTR BLUE
+{
+    bg_r		0
+    bg_g		0
+    bg_b		0
+    fg_r		64
+    fg_g		64
+    fg_b		255
+
+}
+
+ATTR CYAN
+{
+    bg_r		0
+    bg_g		0
+    bg_b		0
+    fg_r		64
+    fg_g		255
+    fg_b		255
+
+}
+
+ATTR GREY
+{
+    bg_r		0
+    bg_g		0
+    bg_b		0
+    fg_r		196
+    fg_g		196
+    fg_b		196
+
+}
+
+DEFINE MAPFLAG
+{
+}
+
+MAPFLAG NONE 0
+MAPFLAG FOV 1
+MAPFLAG FOVCACHE 2
+MAPFLAG PORTAL 4
+MAPFLAG DIST 8
+
+DEFINE EVENTTYPE
+{
+}
+
+EVENTTYPE NONE 0
+EVENTTYPE FORE 1
+EVENTTYPE BACK 2
+EVENTTYPE SYM 4
+EVENTTYPE FORESYM 5
+EVENTTYPE FOREBACK 3
+EVENTTYPE ALL 7
+
+DEFINE TILE
+{
+    U8		symbol		'&'
+    ENM		attr		ATTR		NORMAL
+    CST		legend		"none"
+
+    bool	ispassable	true
+    bool	istransparent	true
+    bool	isphaseable	true
+    bool	isdiggable	false
+    bool	roomcolor	false
+}
+
+TILE INVALID
+{
+    symbol	'#'
+    attr	BROWN
+    legend	"wall"
+    ispassable		false
+    istransparent	false
+    isphaseable		false
+}
+
+TILE FLOOR
+{
+    symbol	'.'
+    attr	NORMAL
+    legend	"floor"
+    ispassable		true
+    istransparent	true
+}
+
+TILE DOWNSTAIRS
+{
+    symbol	'>'
+    attr	WHITE
+    legend	"downstairs"
+    ispassable		true
+    istransparent 	true
+}
+
+TILE UPSTAIRS
+{
+    symbol	'<'
+    attr	WHITE
+    legend	"upstairs"
+    ispassable		true
+    istransparent 	true
+}
+
+TILE SNOWYPATH
+{
+    symbol	'.'
+    attr	WHITE
+    legend	"snow covered ground"
+    ispassable	true
+    istransparent true
+}
+
+TILE PATH
+{
+    symbol	'.'
+    attr	BROWN
+    legend	"path"
+    ispassable		true
+    istransparent	true
+}
+
+TILE GRASS
+{
+    symbol	'.'
+    attr	GREEN
+    legend	"grass"
+    ispassable		true
+    istransparent	true
+}
+
+TILE FIELD
+{
+    symbol	'"'
+    attr	BROWN
+    legend	"field"
+    ispassable		true
+    istransparent	true
+}
+
+TILE FIRE
+{
+    symbol	'&'
+    attr	ORANGE
+    legend	"fire"
+    ispassable	false
+    istransparent true
+}
+
+TILE WALL
+{
+    symbol	'#'
+    attr	NORMAL
+    legend	"wall"
+
+    ispassable		false
+    istransparent	false
+    isdiggable		true
+    roomcolor		true
+}
+
+TILE SOLIDWALL
+{
+    symbol	'#'
+    attr	BROWN
+    legend	"wall"
+
+    ispassable		false
+    istransparent	false
+    isdiggable		false
+}
+
+TILE PORTAL
+{
+    symbol	'*'
+    attr	PURPLE
+    legend	"portal"
+
+    ispassable		true
+    istransparent	true
+    isdiggable		false
+}
+
+TILE ORANGEPORTAL
+{
+    symbol	'*'
+    attr	ORANGEPORTAL
+    legend	"orange portal"
+
+    ispassable		true
+    istransparent	true
+    isdiggable		false
+}
+
+TILE BLUEPORTAL
+{
+    symbol	'*'
+    attr	BLUEPORTAL
+    legend	"blue portal"
+
+    ispassable		true
+    istransparent	true
+    isdiggable		false
+}
+
+TILE PROTOPORTAL
+{
+    symbol	'#'
+    attr	NORMAL
+    legend	"wall"
+
+    ispassable		false
+    istransparent	false
+    isdiggable		false
+    roomcolor		true
+}
+
+TILE BROKENWALL
+{
+    symbol	'%'
+    attr	NORMAL
+    legend	"broken wall"
+
+    ispassable		false
+    istransparent	false
+    isdiggable		true
+    roomcolor		true
+}
+
+TILE DOOR
+{
+    symbol	'+'
+    attr	BROWN
+    legend	"door"
+
+    ispassable		true
+    istransparent	false
+}
+
+TILE MOUNTAIN
+{
+    symbol	'^'
+    attr	NORMAL
+    legend	"mountain"
+    ispassable		false
+    istransparent	false
+}
+
+TILE ICEMOUNTAIN
+{
+    symbol	'^'
+    attr	WHITE
+    legend	"icy mountain"
+    ispassable		false
+    istransparent	false
+}
+
+TILE SNOWYPASS
+{
+    symbol	'W'
+    attr	WHITE
+    legend	"snowy pass"
+    ispassable		false
+    istransparent	false
+}
+
+TILE BRIDGE
+{
+    symbol	'='
+    attr	BROWN
+    legend	"bridge"
+
+    ispassable		true
+    istransparent	true
+}
+
+TILE WATER
+{
+    symbol	'~'
+    attr	BLUE
+    legend	"water"
+    ispassable		false
+    istransparent	true
+}
+
+TILE FOREST
+{
+    symbol	'&'
+    attr	DKGREEN
+    legend	"forest"
+
+    ispassable		true
+    istransparent	false
+}
+
+DEFINE AI
+{
+}
+
+AI NONE
+{
+}
+
+AI STAYHOME
+{
+}
+
+AI HOME
+{
+}
+
+AI CHARGE
+{
+}
+
+AI STRAIGHTLINE
+{
+}
+
+AI PATHTO
+{
+}
+
+AI ORTHO
+{
+}
+
+AI FLANK
+{
+}
+
+AI RANGECOWARD
+{
+}
+
+AI COWARD
+{
+}
+
+AI MOUSE
+{
+}
+
+
+DEFINE MOB
+{
+    U8		symbol		'@'
+    ENM		attr		ATTR		NORMAL
+
+    CST		name		"generic mob"
+    BOOL	isfriendly	false
+
+    CST		melee_name	"claw"
+    CST		melee_verb	"thwack"
+    DICE	melee_damage	1
+    U8		melee_chance	50
+    ENM		melee_item	ITEM	NONE
+
+    CST		range_name	"none"
+    CST		range_verb	"pierce"
+    BOOL	range_valid	false
+    DICE	range_damage	0
+    U8		range_range	0
+    U8		range_symbol	'*'
+    ENM		range_attr	ATTR	NORMAL
+
+    U8		max_hp		1
+    U8		max_mp		0
+
+    U8		depth		0
+    U8		rarity		100
+
+    ENM		ai		AI		NONE
+
+    BOOL	isslow		false
+    BOOL	isfast		false
+    BOOL	isvampire	false
+    BOOL	hidefromlos	false
+    BOOL	isregenerate	false
+    BOOL	passwall	false
+    BOOL	candig		false
+    BOOL	swallows	false
+    BOOL	breeder		false
+    BOOL	isthief		false
+    BOOL	canleap		false
+    U8		sightrange	100
+}
+
+MOB NONE
+{
+    symbol	'!'
+    attr	WHITE
+    name	"program error"
+
+    rarity	0
+}
+
+MOB AVATAR
+{
+    symbol	'@'
+    attr	WHITE
+    isfriendly	true
+
+    ai		NONE
+
+    melee_name	"bare hands"
+    melee_verb	"punch"
+    melee_damage 1
+
+    range_name	"none"
+    range_verb	"hit"
+    range_valid	false
+    range_damage 0
+    range_range	 0
+    
+    max_hp	65
+    max_mp	15
+
+    name	"You"
+}
+
+
+MOB ANT
+{
+    symbol	'a'
+    attr	DKRED
+
+    name	"ant"
+
+    ai		CHARGE
+
+    melee_verb	"pinch"
+    melee_damage 1d3
+    melee_name	"pincers"
+
+    candig	true
+
+    max_hp	4
+    depth	2
+}
+
+MOB BAT
+{
+    symbol	'b'
+    attr	BROWN
+
+    ai		FLANK
+
+    melee_verb	"bite"
+    melee_damage 1
+    melee_name	"teeth"
+
+    max_hp	1
+
+    depth	1
+
+    isfast	true
+
+    name	"bat"
+}
+
+MOB CAT
+{
+    symbol	'c'
+    attr	GREY
+
+    name	"cat"
+
+    ai		CHARGE
+
+    melee_verb	"slash"
+    melee_damage 1d4
+    melee_name	"claws"
+
+    max_hp	6
+
+    depth	3
+}
+
+MOB DOG
+{
+    symbol	'd'
+    attr	GREY
+
+    name	"dog"
+
+    ai		STRAIGHTLINE
+
+    melee_verb	"bite"
+    melee_damage 1d5
+    melee_name	"teeth"
+
+    max_hp	8
+
+    depth	3
+}
+
+MOB ECHIDNA
+{
+    symbol	'e'
+    attr	GREY
+
+    name	"echidna"
+
+    ai		CHARGE
+
+    melee_verb	"slash"
+    melee_damage 1d3
+    melee_name	"claws"
+
+    max_hp	2
+    depth	1
+    sightrange	1
+}
+
+MOB FROG
+{
+    symbol	'f'
+    attr	GREEN
+
+    name	"frog"
+
+    ai		CHARGE
+
+    melee_verb	"bite"
+    melee_damage 1d5
+    melee_name	"mouth"
+
+    canleap	true
+
+    max_hp	3
+    depth	2
+}
+
+MOB GHOST
+{
+    symbol	'g'
+    attr	LIGHTBLACK
+
+    ai		CHARGE
+
+    melee_verb	"touch"
+    melee_damage	0
+    melee_name	"spectral cold"
+
+    max_hp	4
+    depth	1
+
+    hidefromlos	true
+
+    name	"ghost"
+}
+
+MOB HORSE
+{
+    symbol	'h'
+    attr	BROWN
+
+    name	"horse"
+
+    ai		CHARGE
+
+    melee_verb	"kick"
+    melee_name	"hooves"
+    melee_damage 1d5+2
+
+    max_hp	10
+    depth	4
+}
+
+MOB IMP
+{
+    symbol	'i'
+    attr	RED
+
+    name	"imp"
+
+    ai		RANGECOWARD
+
+    melee_verb	"punch"
+    melee_name	"hands"
+    melee_damage 1
+
+    range_damage 1d2
+    range_valid	true
+    range_range  4
+    range_verb	 "burn"
+    range_name	 "fireball"
+    range_attr	 RED
+
+    max_hp	1
+    depth	1
+}
+
+MOB JACKRABBIT
+{
+    symbol	'j'
+    attr	WHITE
+
+    name	"jack rabbit"
+
+    ai		CHARGE
+
+    melee_verb	"bite"
+    melee_name	"teeth"
+    melee_damage 1
+
+    max_hp	1
+    breeder	true
+    depth	5
+}
+
+MOB KOBOLD
+{
+    symbol	'k'
+    attr	PURPLE
+
+    ai		CHARGE
+
+    melee_verb	"stab"
+    melee_name	"dagger"
+    melee_damage	1d8
+
+    max_hp	2
+    depth	3
+
+    range_verb	"pierce"
+    range_range	4
+    range_damage	1d3
+    range_valid	true
+    range_name	"rocks"
+    name 	"kobold"
+}
+
+MOB LICHEN
+{
+    symbol	'l'
+    attr	GREEN
+
+    name	"lichen"
+
+    ai		STAYHOME
+
+    melee_verb	"brush"
+    melee_damage 0
+    melee_name	"none"
+
+    max_hp	1
+    depth	1
+}
+
+MOB MOUSE
+{
+    symbol	'm'
+    attr	WHITE
+
+    name	"mouse"
+
+    ai		MOUSE
+
+    melee_verb	"nibble"
+    melee_name	"teeth"
+    melee_damage 0
+
+    max_hp	1
+    depth	1
+}
+
+MOB NEWT
+{
+    symbol	'n'
+    attr	YELLOW
+
+    name	"newt"
+
+    ai		CHARGE
+
+    melee_verb	"bite"
+    melee_name	"teeth"
+    melee_damage 1
+
+    max_hp	1
+    depth	1
+}
+
+MOB ORC
+{
+    symbol	'o'
+    attr	BLUE
+
+    name	"orc"
+
+    ai		CHARGE
+
+    melee_verb	"bash"
+    melee_name	"club"
+    melee_damage 1d5+4
+
+    max_hp	20
+    depth	4
+}
+
+MOB PENGUIN
+{
+    symbol	'p'
+    attr	GREY
+
+    name	"penguin"
+
+    ai		HOME
+
+    melee_verb	"bite"
+    melee_name	"beak"
+    melee_damage 1d4
+
+    max_hp	10
+    depth	3
+}
+
+MOB QUEENBEE
+{
+    symbol	'q'
+    attr	YELLOW
+
+    name	"queen bee"
+
+    ai		HOME
+
+    melee_verb	"sting"
+    melee_name	"stinger"
+    melee_damage 1d15
+
+    isfast	true
+
+    max_hp	1
+    depth	4
+}
+
+
+MOB RAT
+{
+    symbol	'r'
+    attr	BROWN
+
+    ai		COWARD
+
+    melee_verb	"bite"
+    melee_name	"teeth"
+    melee_damage 2d2
+
+    max_hp	1
+    depth	1
+
+    name	"rat"
+}
+
+MOB SNAKE
+{
+    symbol	's'
+    attr	GREY
+
+    name	"snake"
+
+    ai		CHARGE
+
+    melee_verb	"bite"
+    melee_name	"teeth"
+    melee_damage 1d3
+
+    max_hp	1
+    depth	1
+}
+
+MOB TURTLE
+{
+    symbol	't'
+    attr	DKGREEN
+
+    name	"turtle"
+
+    ai		CHARGE
+
+    melee_verb	"bite"
+    melee_name	"teeth"
+    melee_damage 1
+    
+    isslow	true
+
+    max_hp	30
+    depth	2
+}
+
+MOB UNICORN
+{
+    symbol	'u'
+    attr	WHITE
+
+    name	"unicorn"
+
+    ai		CHARGE
+
+    melee_verb	"butt"
+    melee_name	"horn"
+    melee_damage 1d5
+
+    max_hp	15
+    depth	3
+}
+
+MOB VAMPIRE
+{
+    symbol	'v'
+    attr	DKRED
+
+    name	"vampire"
+
+    ai		CHARGE
+
+    melee_verb	"drain"
+    melee_name	"teeth"
+    melee_damage 1d5
+
+    isvampire	true
+
+    max_hp	1
+    depth	2
+}
+
+MOB WARTHOG
+{
+    symbol	'w'
+    attr	BROWN
+
+    name	"warthog"
+
+    ai		CHARGE
+
+    melee_verb	"stab"
+    melee_name	"tusks"
+    melee_damage 2d5
+
+    max_hp	15
+    depth	2
+}
+
+MOB GRIDBUG
+{
+    symbol	'x'
+    attr	PURPLE
+
+    name	"grid bug"
+
+    ai		ORTHO
+
+    melee_verb	"zap"
+    melee_name	"electric field"
+    melee_damage 1
+
+    max_hp	1
+    depth	1
+}
+
+MOB YELLOWLIGHT
+{
+    symbol	'y'
+    attr	YELLOW
+
+    name	"yellow light"
+
+    ai		CHARGE
+
+    melee_verb	"blind"
+    melee_name	"bright light"
+    melee_damage 0
+    melee_item	 BLIND
+
+    max_hp	1
+    depth	1
+}
+
+MOB ZOMBIE
+{
+    symbol	'z'
+    attr	BROWN
+
+    ai		CHARGE
+
+    melee_verb	"claw"
+    melee_name	"claws"
+    melee_damage	1d3+1
+    max_hp	5
+    depth	1
+
+    isslow	true
+
+    name	"zombie"
+}
+
+MOB APE
+{
+    symbol	'A'
+    attr	BROWN
+
+    name	"ape"
+
+    ai		CHARGE
+
+    melee_verb	"claw"
+    melee_name	"claws"
+    melee_damage	1d5
+
+    sightrange	3
+
+    max_hp	30
+    depth	5
+}
+
+MOB BEAR
+{
+    symbol	'B'
+    attr	WHITE
+
+    name	"polar bear"
+
+    ai		CHARGE
+
+    melee_verb	"claw"
+    melee_name	"claws"
+    melee_damage	1d7
+
+    max_hp	30
+    depth	6
+}
+
+
+MOB CENTAUR
+{
+    symbol	'C'
+    attr	GREEN
+
+    name	"centaur"
+
+    ai		RANGECOWARD
+
+    melee_verb	"slash"
+    melee_name	"sword"
+    melee_damage	1d8
+
+    isfast	true
+
+    range_name	"bow and arrow"
+    range_verb	"pierce"
+    range_damage 1d4
+    range_valid	true
+    range_range	 5
+    range_symbol '/'
+    range_attr	BROWN
+
+    max_hp	50
+    depth	10
+}
+
+MOB DRAGON
+{
+    symbol	'D'
+    attr	RED
+
+    name	"dragon"
+
+    ai		CHARGE
+
+    melee_verb	"slash"
+    melee_name	"claws"
+    melee_damage	1d7
+
+    range_name	"firebreath"
+    range_verb	"burn"
+    range_damage 1d6
+    range_valid	true
+    range_range	 5
+    range_symbol '*'
+    range_attr	RED
+
+    max_hp	60
+    depth	10
+}
+
+MOB ELEPHANT
+{
+    symbol	'E'
+    attr	GREY
+
+    name	"elephant"
+
+    ai		CHARGE
+
+    melee_verb	"trample"
+    melee_name	"feet"
+    melee_damage	1d15
+
+    max_hp	250
+    depth	15
+}
+
+MOB FUNGUS
+{
+    symbol	'F'
+    attr	PURPLE
+
+    name	"fungus"
+
+    ai		STAYHOME
+
+    melee_verb	"brush"
+    melee_damage 0
+    melee_name	"none"
+
+    max_hp	30
+    depth	5
+}
+
+MOB GIANT
+{
+    symbol	'G'
+    attr	YELLOW
+
+    name	"giant"
+
+    ai		CHARGE
+
+    melee_verb	"crush"
+    melee_name	"giant club"
+    melee_damage	1d6
+
+    range_name	"boulder"
+    range_verb	"crush"
+    range_damage 1d4
+    range_valid	true
+    range_range	 3
+    range_symbol '0'
+    range_attr	GREY
+
+    max_hp	40
+    depth	8
+}
+
+MOB HIPPO
+{
+    symbol	'H'
+    attr	GREY
+
+    name	"hippopotamus"
+
+    ai		CHARGE
+
+    melee_verb	"crush"
+    melee_name	"trample"
+    melee_damage	1d14
+
+    sightrange	2
+
+    max_hp	100
+    depth	13
+}
+
+MOB ICEBEAST
+{
+    symbol	'I'
+    attr	CYAN
+
+    name	"icebeast"
+    
+    ai		CHARGE
+
+    melee_verb	"freeze"
+    melee_name	"icey grasp"
+    melee_damage 1
+    melee_item	 SLOW
+
+    max_hp	32
+    depth 	9
+}
+
+MOB JAGUAR
+{
+    symbol	'J'
+    attr	BROWN
+
+    name	"jaguar"
+
+    ai		CHARGE
+
+    melee_verb	"claw"
+    melee_damage 1d5+6
+
+    max_hp	20
+    depth	6
+}
+
+MOB KLEPTOMANIAC
+{
+    symbol	'K'
+    attr	WHITE
+
+    name	"kleptomaniac"
+
+    ai		CHARGE
+
+    melee_verb	"frisk"
+    melee_damage 1
+    isthief	true
+
+    max_hp	50
+    depth	11
+}
+
+
+MOB LICH
+{
+    symbol	'L'
+    attr	PURPLE
+
+    name	"lich"
+
+    ai		RANGECOWARD
+
+    melee_verb	"stab"
+    melee_name	"dagger"
+    melee_damage 1d3
+
+    range_name	"cast death bolt"
+    range_verb	"drain"
+    range_damage 1d7
+    range_valid	true
+    range_range	 5
+    range_symbol '*'
+    range_attr	GREEN
+
+    max_hp	130
+    depth 	14
+}
+
+MOB MUMMY
+{
+    symbol	'M'
+    attr	WHITE
+
+    name	"mummy"
+
+    ai		HOME
+
+    sightrange	3
+
+    melee_verb	"punch"
+    melee_name	"fists"
+    melee_damage 1d16
+
+    max_hp	70
+    depth 	12
+}
+
+MOB NAGA
+{
+    symbol	'N'
+    attr	RED
+
+    name	"naga"
+
+    ai		RANGECOWARD
+
+    melee_verb	"slash"
+    melee_name	"sword"
+    melee_damage 1d6
+
+    range_name	"spears"
+    range_verb	"stab"
+    range_damage 1d2
+    range_valid	true
+    range_range	 4
+    range_symbol '/'
+    range_attr	BROWN
+
+    isslow	true
+
+    max_hp	30
+    depth 	8
+}
+
+MOB OGRE
+{
+    symbol	'O'
+    attr	YELLOW
+
+    name	"ogre"
+
+    ai		CHARGE
+
+    melee_verb	"bash"
+    melee_name	"spiked club"
+    melee_damage 1d8
+
+    max_hp	50
+    depth	9
+}
+
+MOB PYTHON
+{
+    symbol	'P'
+    attr	YELLOW
+
+    name	"python"
+
+    ai		CHARGE
+
+    melee_verb	"swallow"
+    melee_name	"swallows whole"
+    melee_damage 4
+    swallows	true
+
+    max_hp	35
+    depth	6
+}
+
+MOB QUOLL
+{
+    symbol	'Q'
+    attr	BROWN
+
+    name	"quoll"
+
+    ai		CHARGE
+
+    melee_verb	"claw"
+    melee_name	"claws"
+    melee_damage 1d15
+    isfast	 true
+
+    max_hp	20
+    depth	7
+}
+
+MOB ROUS
+{
+    symbol	'R'
+    attr	BROWN
+
+    name	"rous"
+
+    ai		CHARGE
+
+    melee_verb	"bite"
+    melee_name	"teeth"
+    melee_damage 1d2
+
+    max_hp	10
+    depth	5
+}
+
+MOB SLUG
+{
+    symbol	'S'
+    attr	PURPLE
+
+    name	"purple slug"
+
+    ai		CHARGE
+
+    melee_verb	"slime"
+    melee_name	"acidic slime"
+    melee_damage 2d7
+
+    isslow	true
+    max_hp	100
+    depth	13
+}
+
+MOB TROLL
+{
+    symbol	'T'
+    attr	BROWN
+
+    name	"troll"
+
+    ai		CHARGE
+
+    melee_verb	"bite"
+    melee_name	"teeth"
+    melee_damage 2d3
+
+    max_hp	75
+    isregenerate	true
+    depth	11
+}
+
+MOB UMBERHULK
+{
+    symbol	'U'
+    attr	GREY
+
+    name	"umber hulk"
+
+    ai		CHARGE
+
+    melee_verb	"bash"
+    melee_name	"fists"
+    melee_damage 2d2
+
+    max_hp	40
+    candig	true
+    depth	10
+}
+
+MOB VAMPIRELORD
+{
+    symbol	'V'
+    attr	RED
+
+    name	"vampire lord"
+
+    ai		CHARGE
+
+    melee_verb	"drain"
+    melee_name	"teeth"
+    melee_damage 2d4
+
+    isvampire	true
+
+    max_hp	15
+    depth	10
+}
+
+MOB WRAITH
+{
+    symbol	'W'
+    attr	LIGHTBLACK
+
+    name	"wraith"
+
+    ai		CHARGE
+
+    melee_verb	"touch"
+    melee_name	"spectral cold"
+    melee_damage 0
+
+    max_hp	80
+    depth	12
+
+    hidefromlos	true
+}
+
+MOB XORN
+{
+    symbol	'X'
+    attr	BROWN
+
+    name	"xorn"
+
+    ai		CHARGE
+
+    melee_verb	"bite"
+    melee_name	"teeth"
+    melee_damage 1d4
+
+    passwall	true
+
+    max_hp	75
+    depth	11
+}
+
+MOB YETI
+{
+    symbol	'Y'
+    attr	WHITE
+
+    name	"yeti"
+
+    ai		CHARGE
+
+    melee_verb	"bite"
+    melee_name	"teeth"
+    melee_damage 1d8
+
+    max_hp	35
+    depth	6
+}
+
+MOB SKELETONCAPTAIN
+{
+    symbol	'Z'
+    attr	WHITE
+
+    ai		RANGECOWARD
+
+    melee_verb	"eviscerate"
+    melee_name	"long sword"
+    melee_damage	1d24
+    
+    max_hp	200
+
+    range_verb	"pierce"
+    range_damage	1d3
+    range_valid	true
+    range_range		5
+    range_name	"long bow"
+
+    name	"skeleton captain"
+
+    depth	15
+}
+
+MOB EVILDEMON
+{
+    symbol	'&'
+    attr	RED
+
+    ai		PATHTO
+
+    melee_verb	"rend"
+    melee_name	"flaming sword"
+    melee_damage	1d24
+    
+    max_hp	200
+
+    range_valid	false
+
+    name	"evil demon boss"
+
+    rarity	0
+    depth	25
+}
+
+DEFINE ROLE
+{
+    CST		name	"none"
+
+    U8		mp		0
+    U8		hp		0
+
+    U8		w_power		0
+    U8		w_accuracy	0
+    U8		w_consistency	0
+
+    U8		b_range		0
+    U8		b_power		0
+    U8		b_consistency	0
+    U8		b_area 		0
+    U8		b_mana		0
+
+    U8		symbol		'?'
+}
+
+ROLE BARBARIAN
+{
+    name	"barbarian"
+
+    symbol	'B'
+
+    mp		0
+    hp		50
+
+    w_power		100
+    w_accuracy		1
+    w_consistency	2
+
+    b_range		1
+    b_power		100
+    b_consistency	10
+    b_area		2
+    b_mana		100
+}
+
+ROLE THIEF
+{
+    name	"thief"
+
+    symbol	'T'
+
+    mp		10
+    hp		40
+
+    w_power		5	
+    w_accuracy		100
+    w_consistency	52
+
+    b_range		100
+    b_power		10
+    b_consistency	20
+    b_area		2
+    b_mana		100
+}
+
+ROLE FIGHTER
+{
+    name	"fighter"
+
+    symbol	'F'
+
+    mp		10
+    hp		40
+
+    w_power		80	
+    w_accuracy		50
+    w_consistency	40
+
+    b_range		70
+    b_power		80
+    b_consistency	20
+    b_area		2
+    b_mana		100
+}
+
+ROLE PALADIN
+{
+    name	"paladin"
+
+    symbol	'P'
+
+    mp		20
+    hp		30
+
+    w_power		2	
+    w_accuracy		30
+    w_consistency	90
+
+    b_range		20
+    b_power		10
+    b_consistency	50
+    b_area		7
+    b_mana		100
+}
+
+ROLE TOURIST
+{
+    name	"tourist"
+
+    symbol	't'
+
+    mp		25
+    hp		25
+
+    w_power		50	
+    w_accuracy		50
+    w_consistency	50
+
+    b_range		50
+    b_power		50
+    b_consistency	50
+    b_area		50
+    b_mana		50
+}
+
+ROLE MONK
+{
+    name	"monk"
+
+    symbol	'M'
+
+    mp		30
+    hp		20
+
+    w_power		50	
+    w_accuracy		90
+    w_consistency	70
+
+    b_range		5
+    b_power		50
+    b_consistency	90
+    b_area		50
+    b_mana		20
+}
+
+ROLE PRIEST
+{
+    name	"priest"
+
+    symbol	'p'
+
+    mp		40
+    hp		10
+
+    w_power		50	
+    w_accuracy		100
+    w_consistency	2
+
+    b_range		40
+    b_power		100
+    b_consistency	50
+    b_area		7
+    b_mana		100
+}
+
+ROLE SHAMAN
+{
+    name	"shaman"
+
+    symbol	'S'
+
+    mp		40
+    hp		10
+
+    w_power		100
+    w_accuracy		50
+    w_consistency	12
+
+    b_range		10
+    b_power		20
+    b_consistency	50
+    b_area		70
+    b_mana		1
+}
+
+ROLE WIZARD
+{
+    name	"wizard"
+
+    symbol	'W'
+
+    mp		50
+    hp		0
+
+    w_power		5	
+    w_accuracy		100
+    w_consistency	52
+
+    b_range		10
+    b_power		100
+    b_consistency	20
+    b_area		70
+    b_mana		1
+}
+
+DEFINE WEAPON_MATERIAL
+{
+    CST		name		"crayon"
+
+    U8		power		0
+    U8		accuracy	0
+    U8		consistency	0
+}
+
+COMMENT
+{
+    Metals tend to increase power most.
+    Gems will increase accuracy most.
+}
+
+WEAPON_MATERIAL WOOD
+{
+    name	"wooden"
+
+    power	0
+    accuracy	1
+    consistency	1
+}
+
+WEAPON_MATERIAL STONE
+{
+    name	"stone"
+
+    power	2
+    accuracy	2
+    consistency	0
+}
+
+WEAPON_MATERIAL BRONZE
+{
+    name	"bronze"
+
+    power	4
+    accuracy	2
+    consistency	0
+}
+
+WEAPON_MATERIAL IRON
+{
+    name	"iron"
+    power	6
+    accuracy	2
+    consistency	0
+}
+
+WEAPON_MATERIAL STEEL
+{
+    name	"steel"
+    power	8
+    accuracy	3
+    consistency	0
+}
+
+WEAPON_MATERIAL SILVER
+{
+    name	"silver"
+    power	10
+    accuracy	4
+    consistency	0
+}
+
+WEAPON_MATERIAL GOLD
+{
+    name	"gold"
+    power	12
+    accuracy	5
+    consistency	0
+}
+
+WEAPON_MATERIAL ADAMANTIUM
+{
+    name	"adamantium"
+    power	15
+    accuracy	6
+    consistency	0
+}
+
+WEAPON_MATERIAL UNOBTANIUM
+{
+    name	"unobtanium"
+    power	20
+    accuracy	7
+    consistency	0
+}
+
+WEAPON_MATERIAL CRYSTAL
+{
+    name	"crystal"
+
+    power	0
+    accuracy	4
+    consistency	3
+}
+
+WEAPON_MATERIAL ZIRCONIUM
+{
+    name	"zircon"
+
+    power	0
+    accuracy	6
+    consistency	4
+}
+
+WEAPON_MATERIAL QUARTZ
+{
+    name	"quartz"
+
+    power	0
+    accuracy	8
+    consistency	5
+}
+
+WEAPON_MATERIAL RUBY
+{
+    name	"ruby"
+
+    power	0
+    accuracy	10
+    consistency	6
+}
+
+WEAPON_MATERIAL EMERALD
+{
+    name	"emerald"
+
+    power	0
+    accuracy	12
+    consistency	7
+}
+
+WEAPON_MATERIAL DIAMOND
+{
+    name	"diamond"
+
+    power	0
+    accuracy	15
+    consistency	8
+}
+
+COMMENT
+{
+    The weapon types vary according to
+    Blunt: Consistent
+    Piercing: Accuracy
+    Slashing: Power
+}
+
+DEFINE WEAPON_TYPE
+{
+    CST		name		"cosh"
+    CST		verb		"hit"
+
+    U8		power		0
+    U8		accuracy	0
+    U8		consistency	0
+}
+
+WEAPON_TYPE KNIFE
+{
+    name	"knife"
+    verb	"slash"
+    power	2
+    accuracy	0
+    consistency	0
+}
+
+WEAPON_TYPE SHORTSWORD
+{
+    name	"short sword"
+    verb	"slash"
+
+    power	5
+    accuracy	2
+    consistency	0
+}
+
+WEAPON_TYPE LONGSWORD
+{
+    name	"long sword"
+    verb	"slash"
+
+    power	9
+    accuracy	4
+    consistency	0
+}
+
+WEAPON_TYPE AXE
+{
+    name	"axe"
+    verb	"slash"
+
+    power	12
+    accuracy	6
+    consistency	0
+}
+
+WEAPON_TYPE BATTLEAXE
+{
+    name	"battle-axe"
+    verb	"cleave"
+
+    power	16
+    accuracy	7
+    consistency	0
+}
+
+WEAPON_TYPE CLUB
+{
+    name	"club"
+    verb	"bash"
+
+    power	0
+    accuracy	0
+    consistency	2
+}
+
+WEAPON_TYPE MACE
+{
+    name	"mace"
+    verb	"bash"
+
+    power	0
+    accuracy	2
+    consistency	5
+}
+
+WEAPON_TYPE HAMMER
+{
+    name	"hammer"
+    verb	"crush"
+
+    power	0
+    accuracy	3
+    consistency	8
+}
+
+WEAPON_TYPE WARHAMMER
+{
+    name	"warhammer"
+    verb	"crush"
+
+    power	0
+    accuracy	5
+    consistency	15
+}
+
+WEAPON_TYPE DAGGER
+{
+    name	"dagger"
+    verb	"jab"
+
+    power	1
+    accuracy	2
+    consistency	0
+}
+
+WEAPON_TYPE SHORTSPEAR
+{
+    name	"short spear"
+    verb	"stab"
+
+    power	3
+    accuracy	8
+    consistency	3
+}
+
+WEAPON_TYPE SPEAR
+{
+    name	"spear"
+    verb	"impale"
+
+    power	6
+    accuracy	15
+    consistency	6
+}
+
+COMMENT
+{
+    // These are just varied and silly.
+}
+
+DEFINE WEAPON_MODIFIER
+{
+    CST		name		"stinky"
+
+    U8		power		0
+    U8		accuracy	0
+    U8		consistency	0
+}
+
+WEAPON_MODIFIER BROKEN
+{
+    name	"broken"
+
+    power	0
+    accuracy	0
+    consistency	0
+}
+
+WEAPON_MODIFIER WORN
+{
+    name	"worn"
+
+    power	0
+    accuracy	0
+    consistency 1
+}
+
+WEAPON_MODIFIER CHIPPED
+{
+    name	"chipped"
+
+    power	2
+    accuracy	0
+    consistency	0
+}
+
+WEAPON_MODIFIER SCRATCHED
+{
+    name	"scratched"
+
+    power	1
+    accuracy	2
+    consistency	1
+}
+
+WEAPON_MODIFIER PLAIN
+{
+    name	"plain"
+
+    power	2
+    accuracy	2
+    consistency	2
+}
+
+WEAPON_MODIFIER SHARP
+{
+    name	"sharp"
+
+    power	5
+    accuracy	2
+    consistency 2
+}
+
+WEAPON_MODIFIER HOMING
+{
+    name	"homing"
+
+    power	2
+    accuracy	5
+    consistency	2
+}
+
+WEAPON_MODIFIER RUNED
+{
+    name	"runed"
+
+    power	3
+    accuracy	3
+    consistency	8
+}
+
+WEAPON_MODIFIER GLOWING
+{
+    name	"glowing"
+
+    power	8
+    accuracy	1
+    consistency	3
+}
+
+WEAPON_MODIFIER ELDRITCH
+{
+    name	"eldritch"
+
+    power	5
+    accuracy	10
+    consistency	5
+}
+
+WEAPON_MODIFIER ARTIFACT
+{
+    name	"artifact"
+
+    power	12
+    accuracy	7
+    consistency	5
+}
+
+DEFINE BOOK_TYPE
+{
+    CST		name		"cantrip"
+    u8		area		1
+    u8		power		0
+    u8		consistency	0
+    u8		range		0
+    u8		mana		0
+
+    u8		symbol		'/'
+}
+
+BOOK_TYPE BOLT
+{
+    name	"bolt"
+    
+    area	1
+    mana	1
+
+    symbol	'/'
+}
+
+BOOK_TYPE BALL
+{
+    name	"ball"
+    area	2
+    mana	2
+
+    symbol	'*'
+}
+
+BOOK_TYPE STORM
+{
+    name	"storm"
+    area	3
+    mana	4
+
+    symbol	'*'
+}
+
+DEFINE BOOK_MATERIAL
+{
+    CST		name		"phased"
+
+    u8		area		0
+    u8		power		0
+    u8		consistency	0
+    u8		range		0
+    u8		mana		0
+}
+
+BOOK_MATERIAL PAPYRUS
+{
+    name	"papyrus"
+
+    power	0
+    consistency	0
+    range	0
+}
+
+BOOK_MATERIAL PAPER
+{
+    name	"paper"
+
+    power	0
+    consistency	2
+    range	0
+}
+
+BOOK_MATERIAL LEATHER
+{
+    name	"leather"
+
+    power	1
+    consistency	4
+    range	0
+}
+
+BOOK_MATERIAL METAL
+{
+    name	"metal"
+
+    power	4
+    consistency	0
+    range	0
+}
+
+BOOK_MATERIAL GOLD
+{
+    name	"gold"
+
+    power	5
+    consistency	0
+    range	1
+}
+
+BOOK_MATERIAL SKIN
+{
+    name	"human skin"
+    
+    power	8
+    consistency	0
+    range	2
+}
+
+BOOK_MATERIAL DRAGONHIDE
+{
+    name	"dragon hide"
+
+    power	15
+    consistency	0
+    range	3
+}
+
+BOOK_MATERIAL NAUGAHYDE
+{
+    name	"naugahyde"
+
+    power	2
+    consistency	8
+    range	2
+}
+
+
+DEFINE BOOK_ELEMENT
+{
+    CST		name		"nether"
+
+    u8		area		0
+    u8		power		0
+    u8		consistency	0
+    u8		range		0
+    u8		mana		0
+
+    ENM		attr		ATTR	WHITE
+}
+
+BOOK_ELEMENT SHOCK
+{
+    name	"shock"
+    power	2
+    consistency	0
+    range	2
+
+    attr	YELLOW
+}
+
+BOOK_ELEMENT LIGHTNING
+{
+    name	"lightning"
+    power	10
+    consistency	0
+    range	5
+
+    attr	YELLOW
+}
+
+BOOK_ELEMENT THUNDER
+{
+    name	"thunder"
+    power	15
+    consistency	0
+    range	7
+
+    attr	YELLOW
+}
+
+BOOK_ELEMENT CHILL
+{
+    name	"chill"
+
+    power	0
+    consistency	1
+    range	2
+
+    attr	CYAN
+}
+
+BOOK_ELEMENT COLD
+{
+    name	"cold"
+
+    power	0
+    consistency	3
+    range	3
+
+    attr	CYAN
+}
+
+BOOK_ELEMENT FROST
+{
+    name	"frost"
+
+    power	0
+    consistency	8
+    range	4
+
+    attr	WHITE
+}
+
+BOOK_ELEMENT FIRE
+{
+    name	"fire"
+    power	4
+    consistency	4
+    range	4
+
+    attr	RED
+}
+
+BOOK_ELEMENT POISON
+{
+    name	"poison"
+    power	10
+    consistency	0
+    range	8
+
+    attr	GREEN
+}
+
+BOOK_ELEMENT FORCE
+{
+    name	"force"
+    
+    power	0
+    consistency	15
+    range	2
+
+    attr	PURPLE
+}
+
+DEFINE ITEM
+{
+    CST		name		"Si"
+    S16		timer		-1
+    S16		rarity		100
+
+    U8		symbol		'&'
+    ENM		attr	ATTR	CYAN
+    
+    BOOL	exclusive	false
+
+    CST		gaintxt		0
+    CST		losetxt		0
+    BOOL	needtarget	false
+    BOOL	unstackable	false    
+}
+
+ITEM NONE
+{
+    name	"Programming Error"
+    symbol	'!'
+    attr	WHITE
+    rarity	0
+}
+
+ITEM SPEEDBOOTS
+{
+    symbol	'['
+    attr	CYAN
+
+    name	"speed boots"
+    timer	400
+    rarity	2
+    gaintxt	"You wear the boots."
+    losetxt	"Your %O run out of mana."
+}
+
+ITEM QUICKBOOST
+{
+    symbol	'!'
+    attr	GREEN
+
+    name	"quick boost potion"
+    timer	50
+    rarity	1
+    gaintxt	"You drink %O.  Your feet dance quickly!"
+    losetxt	"Your movements slow."
+}
+
+ITEM BLIND
+{
+    name	"Blinded"
+    timer	5
+    rarity	0
+    exclusive	true
+    gaintxt	"%S <be> blinded!"
+    losetxt	"%S can see!"
+}
+
+ITEM SLOW
+{
+    name	"Slow"
+    timer	5
+    rarity	0
+    exclusive	true
+    gaintxt	"Your muscles slow."
+    losetxt	"You regain normal movement."
+}
+
+ITEM REGENRING
+{
+    symbol	'='
+    attr	ORANGE
+
+    name	"ring of regeneration"
+    timer	35
+    rarity	2
+    gaintxt	"You wear the ring."
+    losetxt	"Your %o runs out of mana."
+}
+
+ITEM INVULNERABLE
+{
+    symbol	'['
+    attr	WHITE
+
+    name	"cloak of invulnerability"
+    timer	50
+    rarity	1
+    gaintxt	"You wear the cloak."
+    losetxt	"Your %o runs out of mana."
+}
+
+ITEM HEALPOTION
+{
+    symbol	'!'
+    attr	YELLOW
+
+    name	"healing potion"
+    rarity	30
+    losetxt	"%S drink %O."
+}
+
+ITEM MANAPOTION
+{
+    symbol	'!'
+    attr	CYAN
+
+    name	"mana potion"
+    rarity	30
+    losetxt	"%S drink %O."
+}
+
+ITEM WEAPON
+{
+    symbol	'('
+    attr	WHITE
+
+    name	"Undefined Weapon"
+    rarity	100
+    losetxt	"%S replace %r %o."
+
+    unstackable	true
+}
+
+ITEM SPELLBOOK
+{
+    symbol	'+'
+    attr	WHITE
+
+    name	"Undefined Book"
+    rarity	100
+    losetxt	"%S replace %r %o."
+
+    unstackable	true
+}
+
