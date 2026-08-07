@@ -2,6 +2,18 @@
 - more rooms
 - lost avatar on restart?
 
+Portals show trail past mobs as they go through now.
+  Fixed in 003
+
+Pure range spells should punch through monsters.
+  Fixed in 003
+
+Fuzzy portal was putting portals on top of portals
+  Fixed in 003
+
+Bump horizontally slide/move diagonally
+  Fixed in 003
+
 Martin Bays: - Fuzzy portal firing. ignore mobs 
     Fixed in - 002
 Martin Bays - Some hint of the map showing blue -> yellow with correct

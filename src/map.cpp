@@ -123,6 +123,10 @@ POS::prepSquareForDestruction() const
 	    return false;
     }
 
+    // If this square is a portal, don't dig!
+    if (r->getFlag(myX, myY) & MAPFLAG_PORTAL)
+	return false;
+
     return true;
 }
 
@@ -290,8 +294,10 @@ POS::load(istream &is)
 }
 
 MOB *
-POS::traceBullet(int range, int dx, int dy) const
+POS::traceBullet(int range, int dx, int dy, int *rangeleft) const
 {
+    if (rangeleft)
+	*rangeleft = 0;
     if (!dx && !dy)
 	return mob();
 
@@ -302,7 +308,11 @@ POS::traceBullet(int range, int dx, int dy) const
 	range--;
 	next = next.delta(dx, dy);
 	if (next.mob())
+	{
+	    if (rangeleft)
+		*rangeleft = range;
 	    return next.mob();
+	}
 
 	// Stop at a wall.
 	if (!next.defn().ispassable)
@@ -374,7 +384,7 @@ POS::postEvent(EVENTTYPE_NAMES type, u8 sym, ATTR_NAMES attr) const
 }
 
 void
-POS::displayBullet(int range, int dx, int dy, u8 sym, ATTR_NAMES attr) const
+POS::displayBullet(int range, int dx, int dy, u8 sym, ATTR_NAMES attr, bool stopatmob) const
 {
     if (!dx && !dy)
 	return;
@@ -391,7 +401,7 @@ POS::displayBullet(int range, int dx, int dy, u8 sym, ATTR_NAMES attr) const
 	    return;
 
 	// Stop at mobs
-	if (next.mob())
+	if (stopatmob && next.mob())
 	    return;
 
 	next.postEvent(EVENTTYPE_FORESYM, sym, attr);

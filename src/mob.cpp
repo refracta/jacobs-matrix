@@ -801,6 +801,7 @@ bool
 MOB::actionFire(int dx, int dy)
 {
     MOB		*victim;
+    int		rangeleft;
     
     // Check for no ranged weapon.
     if (!defn().range_valid && !hasItem(ITEM_SPELLBOOK))
@@ -840,7 +841,7 @@ MOB::actionFire(int dx, int dy)
     }
 
     // Check for friendly kill.
-    victim = pos().traceBullet(getRangedRange(), dx, dy);
+    victim = pos().traceBullet(getRangedRange(), dx, dy, &rangeleft);
 
     if (victim && victim->isFriends(this))
     {
@@ -865,10 +866,6 @@ MOB::actionFire(int dx, int dy)
     
     getRangedLook(symbol, attr);
 
-    pos().displayBullet(getRangedRange(),
-			dx, dy,
-			symbol, attr);
-
     // Subtract the mana used.
     if (isAvatar())
     {
@@ -881,6 +878,11 @@ MOB::actionFire(int dx, int dy)
 	    area = r->getRangeArea();
 	}
     }
+    pos().displayBullet(getRangedRange(),
+			dx, dy,
+			symbol, attr,
+			!isAvatar() || area != 1);
+
 
     if (!victim)
     {
@@ -906,6 +908,24 @@ MOB::actionFire(int dx, int dy)
 
     // Apply damage to everyone in range.
     vpos.fireball(this, area, getRangedDPDF(), symbol, attr); 
+    
+
+    while (isAvatar() && rangeleft && area == 1)
+    {
+	// Ensure our dx/dy is copacetic.
+	vpos.setAngle(pos().angle());
+	victim = vpos.traceBullet(rangeleft, dx, dy, &rangeleft);
+
+	if (victim)
+	{
+	    msg_format("%S %v %O.", this, defn().range_verb,
+				    victim);
+	    vpos = victim->pos();
+	    vpos.fireball(this, area, getRangedDPDF(), symbol, attr); 
+	}
+	else
+	    rangeleft = 0;
+    }
     return true;
 }
 
@@ -940,7 +960,8 @@ MOB::actionPortalFire(int dx, int dy, int portal)
     
     pos().displayBullet(portalrange,
 			dx, dy,
-			symbol, attr);
+			symbol, attr,
+			false);
 
     POS		vpos;
     vpos = pos().traceBulletPos(portalrange, dx, dy, false, false);
@@ -1044,6 +1065,12 @@ MOB::buildPortalAtLocation(POS vpos, int portal) const
 	}
     }
 
+    // Failed to find a proper portal.
+    if (floordir < 0)
+	return false;
+
+    cerr << "Build user portal dir " << floordir << endl;
+
     vpos.map()->buildUserPortal(vpos, portal, (floordir+2) & 3);
     return true;
 }
@@ -1136,6 +1163,30 @@ MOB::actionWalk(int dx, int dy)
 	    if (canMoveDir(dx, 0, false))
 		if (actionWalk(dx, 0))
 		    return true;
+	}
+	else if ((dx || dy) && isAvatar())
+	{
+	    // If we have
+	    // ..
+	    // @#
+	    // ..
+	    // Moving right we want to slide to a diagonal.
+	    int		sdx, sdy;
+
+	    // This bit of code is too clever for its own good!
+	    sdx = !dx;
+	    sdy = !dy;
+
+	    if (!rand_choice(2) && canMoveDir(dx+sdx, dy+sdy, false))
+		if (actionWalk(dx+sdx, dy+sdy))
+		    return true;
+	    if (canMoveDir(dx-sdx, dy-sdy, false))
+		if (actionWalk(dx-sdx, dy-sdy))
+		    return true;
+	    if (canMoveDir(dx+sdx, dy+sdy, false))
+		if (actionWalk(dx+sdx, dy+sdy))
+		    return true;
+	    
 	}
 
 	msg_format("%S <be> blocked by %O.", this, t.defn().legend);

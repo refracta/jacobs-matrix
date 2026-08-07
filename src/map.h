@@ -77,7 +77,7 @@ public:
     void	dirTo(POS goal, int &dx, int &dy) const;
 
     /// Returns the first mob along the given vector from here.
-    MOB		*traceBullet(int range, int dx, int dy) const;
+    MOB		*traceBullet(int range, int dx, int dy, int *rangeleft=0) const;
 
     /// Returns the last valid pos before we hit a wall, if stop
     /// before wall set.  Otherwise returns the wall hit.
@@ -89,7 +89,7 @@ public:
     void	 describeSquare(bool blind) const;
 
     /// Draws the given bullet to the screen.
-    void	 displayBullet(int range, int dx, int dy, u8 sym, ATTR_NAMES attr) const;
+    void	 displayBullet(int range, int dx, int dy, u8 sym, ATTR_NAMES attr, bool stopatmob) const;
 
     void	 postEvent(EVENTTYPE_NAMES type, u8 sym, ATTR_NAMES attr) const;
 
