@@ -266,6 +266,12 @@ gfx_updatepulsetime()
 void 
 gfx_printchar(int x, int y, u8 c, ATTR_NAMES attr)
 {
+    gfx_printcodepoint(x, y, c, attr);
+}
+
+void
+gfx_printcodepoint(int x, int y, unsigned int c, ATTR_NAMES attr)
+{
     TCODColor		fg(glb_attrdefs[attr].fg_r,
 			   glb_attrdefs[attr].fg_g,
 			   glb_attrdefs[attr].fg_b);
@@ -278,6 +284,69 @@ gfx_printchar(int x, int y, u8 c, ATTR_NAMES attr)
 					       glb_attrdefs[attr].bg_b));
     TCODConsole::root->setFore(x, y, fg);
     TCODConsole::root->setChar(x, y, c);
+}
+
+unsigned int
+gfx_utf8next(const char **text)
+{
+    const unsigned char *src = (const unsigned char *) *text;
+    unsigned int c;
+
+    if (!src || !*src)
+	return 0;
+
+    if (src[0] < 0x80)
+    {
+	c = src[0];
+	*text += 1;
+    }
+    else if ((src[0] & 0xe0) == 0xc0 && (src[1] & 0xc0) == 0x80)
+    {
+	c = ((src[0] & 0x1f) << 6) | (src[1] & 0x3f);
+	*text += 2;
+	if (c < 0x80)
+	    c = 0xfffd;
+    }
+    else if ((src[0] & 0xf0) == 0xe0 &&
+	     (src[1] & 0xc0) == 0x80 && (src[2] & 0xc0) == 0x80)
+    {
+	c = ((src[0] & 0x0f) << 12) | ((src[1] & 0x3f) << 6) |
+	    (src[2] & 0x3f);
+	*text += 3;
+	if (c < 0x800 || (c >= 0xd800 && c <= 0xdfff))
+	    c = 0xfffd;
+    }
+    else if ((src[0] & 0xf8) == 0xf0 &&
+	     (src[1] & 0xc0) == 0x80 && (src[2] & 0xc0) == 0x80 &&
+	     (src[3] & 0xc0) == 0x80)
+    {
+	c = ((src[0] & 0x07) << 18) | ((src[1] & 0x3f) << 12) |
+	    ((src[2] & 0x3f) << 6) | (src[3] & 0x3f);
+	*text += 4;
+	if (c < 0x10000 || c > 0x10ffff)
+	    c = 0xfffd;
+    }
+    else
+    {
+	c = 0xfffd;
+	*text += 1;
+    }
+
+    return c;
+}
+
+int
+gfx_utf8width(const char *text)
+{
+    int width = 0;
+
+    while (text && *text)
+    {
+	gfx_utf8next(&text);
+	width++;
+    }
+
+    return width;
 }
 
 void 

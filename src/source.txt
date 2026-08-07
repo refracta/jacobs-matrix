@@ -19,6 +19,11 @@ OPTION PLAY
     name	"Play"
 }
 
+OPTION LANGUAGE
+{
+    name	"Language"
+}
+
 OPTION VOLUME
 {
     name	"Volume"
@@ -2737,4 +2742,3 @@ ITEM SPELLBOOK
 
     unstackable	true
 }
-

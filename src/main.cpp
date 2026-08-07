@@ -48,6 +48,7 @@ int		 glbLevelStartMS = -1;
 #include "rand.h"
 #include "gfxengine.h"
 #include "config.h"
+#include "language.h"
 
 #include <SDL.h>
 #include <SDL_mixer.h>
@@ -192,7 +193,11 @@ mstotime(int ms)
     min = sec / 60;
     sec -= min * 60;
 
-    if (min)
+    if (language_is_korean() && min)
+	buf.sprintf("%d분 %d.%03d초", min, sec, ms);
+    else if (language_is_korean())
+	buf.sprintf("%d.%03d초", sec, ms);
+    else if (min)
 	buf.sprintf("%dm%d.%03ds", min, sec, ms);
     else if (sec)
 	buf.sprintf("%d.%03ds", sec, ms);
@@ -355,26 +360,28 @@ redrawWorld()
 	glbWeaponInfo->setTextAttr(ATTR_WHITE);
 	if (item)
 	{
-	    glbWeaponInfo->appendText(gram_capitalize(item->getName()));
+	    glbWeaponInfo->appendText(language_is_korean() ? item->getName() :
+				gram_capitalize(item->getName()));
 	    glbWeaponInfo->newLine();
 	    glbWeaponInfo->setTextAttr(ATTR_NORMAL);
 	    glbWeaponInfo->appendText(item->getDetailedDescription());
 	}
 	else
-	    glbWeaponInfo->appendText("No Weapon.\n");
+	    glbWeaponInfo->appendText(language_text("No Weapon.\n"));
 	glbWeaponInfo->newLine();
 
 	glbWeaponInfo->setTextAttr(ATTR_WHITE);
 	item = avatar->lookupItem(ITEM_SPELLBOOK);
 	if (item)
 	{
-	    glbWeaponInfo->appendText(gram_capitalize(item->getName()));
+	    glbWeaponInfo->appendText(language_is_korean() ? item->getName() :
+				gram_capitalize(item->getName()));
 	    glbWeaponInfo->newLine();
 	    glbWeaponInfo->setTextAttr(ATTR_NORMAL);
 	    glbWeaponInfo->appendText(item->getDetailedDescription());
 	}
 	else
-	    glbWeaponInfo->appendText("No Spellbook.");
+	    glbWeaponInfo->appendText(language_text("No Spellbook."));
 	glbWeaponInfo->newLine();
 
 	isvictory = avatar->pos().victoryPos();
@@ -382,7 +389,7 @@ redrawWorld()
 	if (isvictory)
 	{
 	    glbVictoryInfo->clear();
-	    glbVictoryInfo->appendText("Press 'v' for Victory!");
+	    glbVictoryInfo->appendText(language_text("Press 'v' for Victory!"));
 	}
 
 	if (glbDeathTS >= 0)
@@ -392,8 +399,15 @@ redrawWorld()
 	    percent = (timems - glbDeathTS) / (float) DEATHTIME;
 	    percent = BOUND(percent, 0.0F, 1.0F);
 
-	    glbDeathInfo->appendText(" Dead, awaiting revival... ");
-	    glbDeathInfo->fillRect(0, 0, (int)(percent * 30), 1, ATTR_DEATHBAR);
+	    // This panel is redrawn every frame.  Without clearing it first,
+	    // multi-byte text is repeatedly appended and appears to jump/flicker.
+	    glbDeathInfo->clear();
+	    glbDeathInfo->fillRect(0, 0, 30, 1, ATTR_NORMAL);
+	    glbDeathInfo->appendText(language_text(" Dead, awaiting revival... "));
+	    // A moving bar beneath very small anti-aliased Hangul looks like shimmer.
+	    // Keep the Korean label stable; retain the original animation in English.
+	    if (!language_is_korean())
+		glbDeathInfo->fillRect(0, 0, (int)(percent * 30), 1, ATTR_DEATHBAR);
 	}
     }
     
@@ -404,10 +418,13 @@ redrawWorld()
     glbJacob->setTextAttr(ATTR_WHITE);
     BUF		buf;
 
-    buf.sprintf(" Depth: %d\n\n", glbMap ? glbMap->getDepth() : 0);
+    if (language_is_korean())
+	buf.sprintf(" 깊이: %d\n\n", glbMap ? glbMap->getDepth() : 0);
+    else
+	buf.sprintf(" Depth: %d\n\n", glbMap ? glbMap->getDepth() : 0);
 
     glbJacob->appendText(buf);
-    glbJacob->appendText(" Jacobian:\n");
+    glbJacob->appendText(language_text(" Jacobian:\n"));
     glbJacob->setTextAttr(ATTR_NORMAL);
     int		*jacob;
 
@@ -510,26 +527,34 @@ buildRoleStats(ROLE_NAMES role)
     BUF		buf, tmp;
 
     glbRoleStats->setTextAttr(ATTR_WHITE);
-    tmp = gram_makeplural(gram_capitalize(glb_roledefs[role].name));
-    buf.sprintf("%s Prefer:", tmp.buffer());
+    if (language_is_korean())
+    {
+	tmp.reference(language_text(glb_roledefs[role].name));
+	buf.sprintf("%s 선호:", tmp.buffer());
+    }
+    else
+    {
+	tmp = gram_makeplural(gram_capitalize(glb_roledefs[role].name));
+	buf.sprintf("%s Prefer:", tmp.buffer());
+    }
     glbRoleStats->appendChoice(buf);
     glbRoleStats->appendChoice("");
-    glbRoleStats->appendChoice("Weapon:");
+    glbRoleStats->appendChoice(language_text("Weapon:"));
     glbRoleStats->setTextAttr(ATTR_NORMAL);
 
-    glbRoleStats->appendChoice("Power", glb_roledefs[role].w_power);
-    glbRoleStats->appendChoice("Accuracy", glb_roledefs[role].w_accuracy);
-    glbRoleStats->appendChoice("Consistency", glb_roledefs[role].w_consistency);
+    glbRoleStats->appendChoice(language_text("Power"), glb_roledefs[role].w_power);
+    glbRoleStats->appendChoice(language_text("Accuracy"), glb_roledefs[role].w_accuracy);
+    glbRoleStats->appendChoice(language_text("Consistency"), glb_roledefs[role].w_consistency);
 
     glbRoleStats->setTextAttr(ATTR_WHITE);
     glbRoleStats->appendChoice("");
-    glbRoleStats->appendChoice("Spellbook:");
+    glbRoleStats->appendChoice(language_text("Spellbook:"));
     glbRoleStats->setTextAttr(ATTR_NORMAL);
-    glbRoleStats->appendChoice("Range", glb_roledefs[role].b_range);
-    glbRoleStats->appendChoice("Power", glb_roledefs[role].b_power);
-    glbRoleStats->appendChoice("Consistency", glb_roledefs[role].b_consistency);
-    glbRoleStats->appendChoice("Area", glb_roledefs[role].b_area);
-    glbRoleStats->appendChoice("Low-Mana", glb_roledefs[role].b_mana);
+    glbRoleStats->appendChoice(language_text("Range"), glb_roledefs[role].b_range);
+    glbRoleStats->appendChoice(language_text("Power"), glb_roledefs[role].b_power);
+    glbRoleStats->appendChoice(language_text("Consistency"), glb_roledefs[role].b_consistency);
+    glbRoleStats->appendChoice(language_text("Area"), glb_roledefs[role].b_area);
+    glbRoleStats->appendChoice(language_text("Low-Mana"), glb_roledefs[role].b_mana);
 }
 
 
@@ -543,7 +568,10 @@ selectRole()
     glbRoleChooser->clear();
     FOREACH_ROLE(role)
     {
-	glbRoleChooser->appendChoice(gram_capitalize(glb_roledefs[role].name));
+	if (language_is_korean())
+	    glbRoleChooser->appendChoice(language_text(glb_roledefs[role].name));
+	else
+	    glbRoleChooser->appendChoice(gram_capitalize(glb_roledefs[role].name));
     }
 
     glbRoleChooser->setChoice(MOB::avatarRole());
@@ -680,7 +708,7 @@ buildOptionsMenu(OPTION_NAMES d)
     glbLevelChooser->setTextAttr(ATTR_NORMAL);
     FOREACH_OPTION(option)
     {
-	glbLevelChooser->appendChoice(glb_optiondefs[option].name);
+	glbLevelChooser->appendChoice(language_text(glb_optiondefs[option].name));
     }
     glbLevelChooser->setChoice(d);
 
@@ -718,6 +746,28 @@ optionsMenu()
 		    // Play...
 		    break;
 		}
+		else if (glbLevelChooser->getChoice() == OPTION_LANGUAGE)
+		{
+		    glbLevelChooser->clear();
+		    glbLevelChooser->appendChoice("English");
+		    glbLevelChooser->appendChoice("한국어");
+		    glbLevelChooser->setChoice((int) language_get());
+
+		    while (!TCODConsole::isWindowClosed())
+		    {
+			redrawWorld();
+			key = gfx_getKey(false);
+			if (glbLevelChooser->processKey(key))
+			    language_set((LANGUAGE_NAMES) glbLevelChooser->getChoice());
+
+			if (key == '\n' || key == ' ' || key == '\x1b')
+			{
+			    language_set((LANGUAGE_NAMES) glbLevelChooser->getChoice());
+			    break;
+			}
+		    }
+		    buildOptionsMenu(OPTION_LANGUAGE);
+		}
 		else if (glbLevelChooser->getChoice() == OPTION_VOLUME)
 		{
 		    int			i;
@@ -727,7 +777,10 @@ optionsMenu()
 
 		    for (i = 0; i <= 10; i++)
 		    {
-			buf.sprintf("%3d%% Volume", (10 - i) * 10);
+			if (language_is_korean())
+			    buf.sprintf("%3d%% 음량", (10 - i) * 10);
+			else
+			    buf.sprintf("%3d%% Volume", (10 - i) * 10);
 
 			glbLevelChooser->appendChoice(buf);
 		    }
@@ -782,7 +835,7 @@ optionsMenu()
 
 		    for (i = 0; i < 5; i++)
 		    {
-			glbLevelChooser->appendChoice(quality[i]);
+			glbLevelChooser->appendChoice(language_text(quality[i]));
 		    }
 
 		    for (i = 0; i < 5; i++)
@@ -867,16 +920,16 @@ buildLevelChooser(int depth)
 
     const char 	*levelnames[10] =
     {
-	"Training Grounds ",
-	"Easy             ",
-	"Straight Forward ",
-	"Hard             ",
-	"Harder           ",
-	"Difficult        ",
-	"Impossible       ",
-	"Implausible      ",
+	"Training Grounds",
+	"Easy",
+	"Straight Forward",
+	"Hard",
+	"Harder",
+	"Difficult",
+	"Impossible",
+	"Implausible",
 	"Out of Adjectives",
-	"Final Level      "
+	"Final Level"
     };
 
     for (i = 1; i <= 10; i++)
@@ -888,7 +941,7 @@ buildLevelChooser(int depth)
 	    glbLevelChooser->setTextAttr(ATTR_NORMAL);
 	else 
 	    glbLevelChooser->setTextAttr(ATTR_OUTOFFOV);
-	buf.strcat(levelnames[i-1]);
+	buf.strcat(language_text(levelnames[i-1]));
 	if (i <= glbLevelTimes.entries() && glbLevelTimes(i-1) >= 0)
 	{
 	    buf.strcat(" (");
@@ -906,7 +959,10 @@ buildLevelChooser(int depth)
 	    glbLevelChooser->setTextAttr(ATTR_RED);
 	else if (i == glbMaxLevel+1)
 	    glbLevelChooser->setTextAttr(ATTR_DKRED);
-	buf.sprintf("Extreme %d       ", i);
+	if (language_is_korean())
+	    buf.sprintf("극한 %d       ", i);
+	else
+	    buf.sprintf("Extreme %d       ", i);
 	if (i < glbLevelTimes.entries() && glbLevelTimes(i-1) >= 0)
 	{
 	    buf.strcat(" (");
@@ -1157,6 +1213,7 @@ main(int argc, char **argv)
     gfx_init();
     MAP::init();
 
+    language_init();
     text_init();
     spd_init();
 
@@ -1326,12 +1383,15 @@ main(int argc, char **argv)
 		if (key == '+' || key == '=' || key == 'g')
 		    portal = 1;
 
-		buf.sprintf("Cast %s portal in what direction?  ", portal ? "orange" : "blue");
+		if (language_is_korean())
+		    buf.sprintf("어느 방향에 %s 차원문을 만들까요?  ", portal ? "주황색" : "파란색");
+		else
+		    buf.sprintf("Cast %s portal in what direction?  ", portal ? "orange" : "blue");
 
 		msg_report(buf);
 		if (awaitDirection(dx, dy) && (dx || dy))
 		{
-		    msg_report(rand_dirtoname(dx, dy));
+		    msg_report(language_text(rand_dirtoname(dx, dy)));
 		    msg_newturn();
 		    glbEngine->queue().append(COMMAND(ACTION_FIRE, dx, dy, portal+1));
 		}
@@ -1348,7 +1408,7 @@ main(int argc, char **argv)
 		msg_report("Cast spell in what direction?  ");
 		if (awaitDirection(dx, dy) && (dx || dy))
 		{
-		    msg_report(rand_dirtoname(dx, dy));
+		    msg_report(language_text(rand_dirtoname(dx, dy)));
 		    msg_newturn();
 		    glbEngine->queue().append(COMMAND(ACTION_FIRE, dx, dy));
 		}
@@ -1402,7 +1462,7 @@ main(int argc, char **argv)
 			victitle.sprintf("victory%d", (depth < 11) ? depth : 11);
 
 			victorytime -= glbLevelStartMS;
-			maintext.strcat("Your time: ");
+			maintext.strcat(language_text("Your time: "));
 			maintext.strcat(mstotime(victorytime));
 			maintext.strcat("\n");
 			while (glbLevelTimes.entries() < depth)
@@ -1411,25 +1471,25 @@ main(int argc, char **argv)
 			if (oldtime < 0)
 			{
 			    // Invalid old time, new best.
-			    maintext.strcat("This is now the time to beat for this level.\n");
+			    maintext.strcat(language_text("This is now the time to beat for this level.\n"));
 			    glbLevelTimes.set(depth-1, victorytime);
 			}
 			else if (oldtime < victorytime)
 			{
-			    maintext.strcat("You did not beat the previous best of ");
+			    maintext.strcat(language_text("You did not beat the previous best of "));
 			    maintext.strcat(mstotime(oldtime));
-			    maintext.strcat(", you fell short by ");
+			    maintext.strcat(language_text(", you fell short by "));
 			    maintext.strcat(mstotime(victorytime-oldtime));
-			    maintext.strcat(".\n");
+			    maintext.strcat(language_is_korean() ? " 늦었습니다.\n" : ".\n");
 			}
 			else
 			{
 			    // New record!
-			    maintext.strcat("You beat the previous best of ");
+			    maintext.strcat(language_text("You beat the previous best of "));
 			    maintext.strcat(mstotime(oldtime));
-			    maintext.strcat(" by ");
+			    maintext.strcat(language_text(" by "));
 			    maintext.strcat(mstotime(oldtime-victorytime));
-			    maintext.strcat(".\n");
+			    maintext.strcat(language_is_korean() ? " 앞당겼습니다.\n" : ".\n");
 
 			    glbLevelTimes.set(depth-1, victorytime);
 			}

@@ -14,6 +14,7 @@
 
 #include "rand.h"
 #include "gfxengine.h"
+#include "language.h"
 
 #include <ctype.h>
 #include <stdlib.h>
@@ -33,10 +34,10 @@ PANEL::PANEL(int w, int h, bool recordhistory)
 
     myBorder = false;
     
-    myLines = new char *[h];
+    myLines = new unsigned int *[h];
     for (i = 0; i < h; i++)
     {
-	myLines[i] = new char [w+10];
+	myLines[i] = new unsigned int [w+1];
 	myLines[i][0] = '\0';
     }
 
@@ -132,111 +133,92 @@ PANEL::appendText(const char *text, int linecount)
 	return;
 
     AUTOLOCK	a(myLock);
-    // Start copying text into myLines[myCurLine][myCurPos], doing
-    // wordwrap at myW.
-    const char		*start;
-    char		*dst;
-    ATTR_NAMES		*dstattr;
-    int			 dstpos;
-
-    start = text;
-    dst = myLines[myCurLine];
-    dstattr = myAttrMap[myCurLine];
-    dstpos = myCurPos;
-
     while (*text)
     {
-	// Check for control characters.
-	if (*text == '\n')
+	const char *word = text;
+	const char *scan;
+	unsigned int codepoint = gfx_utf8next(&text);
+
+	if (codepoint == '\r')
+	    continue;
+
+	if (codepoint == '\n')
 	{
-	    dst[dstpos] = '\0';
-	    linecount++;
-	    newLine();
-	    if (myH <= 2)
-	    {
-		// Cannot scroll with prompt!
-		linecount = 0;
-	    }
-	    else if (linecount >= myH-2) 
-	    {
-		awaitKey();
-		linecount = 0;
-	    }
-	    appendText(text+1, linecount);
-	    return;
-	}
-	
-	// Check to see if we have hit myW.
-	// Note we always scroll one character early!  This is more
-	// visually pleasing than filling to the boundrary.
-	if (dstpos >= myW - myRightMargin)
-	{
-	    // If this is a space, eat all succeeding spaces.
-	    if (ISSPACE(*text))
-	    {
-	    }
-	    else
-	    {
-		const char *fallback;
-
-		fallback = text;
-		
-		// Not a space, we want to roll back until the next space.
-		while (text > start)
-		{
-		    text--;
-		    dstpos--;
-		    if (ISSPACE(*text))
-			break;
-		}
-		if (text == start)
-		{
-		    // Oops, no breakpoint! Hyphenate arbitrarily.
-		    // Restore ourselves to our fallback position.
-		    // The exception is if we did not start with
-		    // an empty line!  In that case, a new line
-		    // may suffice.
-		    if (dstpos == myIndent)
-		    {
-			dstpos += (int)(fallback - text);
-			text = fallback;
-		    }
-		}
-	    }
-
-	    // Write in a null and new line.
-	    dst[dstpos] = '\0';
-
-	    // Go forward in text removing all spaces.
-	    while (*text && ISSPACE(*text))
-	    {
-		text++;
-	    }
-	    linecount++;
-	    newLine();
-	    if (myH <= 2)
-	    {
-		// Cannot scroll with prompt!
-		linecount = 0;
-	    }
-	    else if (linecount >= myH-2) 
-	    {
-		awaitKey();
-		linecount = 0;
-	    }
-	    // Append the remainder.
-	    appendText(text, linecount);
-	    return;
+	    myLines[myCurLine][myCurPos] = 0;
+	    wrappedNewLine(linecount);
+	    continue;
 	}
 
-	// All good for normal addition.
-	dst[dstpos] = *text;
-	dst[dstpos+1] = '\0';
-	dstattr[dstpos] = myTextAttr;
+	if (codepoint == ' ' || codepoint == '\t')
+	{
+	    if (myCurPos < myW - myRightMargin)
+	    {
+		myLines[myCurLine][myCurPos] = ' ';
+		myAttrMap[myCurLine][myCurPos] = myTextAttr;
+		myCurPos++;
+		myLines[myCurLine][myCurPos] = 0;
+	    }
+	    continue;
+	}
 
-	dstpos++;
-	text++;
-	myCurPos = dstpos;
+	// Determine the length of this word in console cells.  UTF-8 bytes do
+	// not correspond to visible character positions.
+	int wordlen = 0;
+	scan = word;
+	while (*scan)
+	{
+	    const char *before = scan;
+	    codepoint = gfx_utf8next(&scan);
+	    if (codepoint == ' ' || codepoint == '\t' ||
+		codepoint == '\r' || codepoint == '\n')
+	    {
+		scan = before;
+		break;
+	    }
+	    wordlen++;
+	}
+
+	if (myCurPos > myIndent &&
+	    myCurPos + wordlen > myW - myRightMargin)
+	    wrappedNewLine(linecount);
+
+	text = word;
+	while (*text)
+	{
+	    const char *before = text;
+	    codepoint = gfx_utf8next(&text);
+	    if (codepoint == ' ' || codepoint == '\t' ||
+		codepoint == '\r' || codepoint == '\n')
+	    {
+		text = before;
+		break;
+	    }
+
+	    if (myCurPos >= myW - myRightMargin)
+		wrappedNewLine(linecount);
+
+	    myLines[myCurLine][myCurPos] = codepoint;
+	    myAttrMap[myCurLine][myCurPos] = myTextAttr;
+	    myCurPos++;
+	    myLines[myCurLine][myCurPos] = 0;
+	}
+    }
+}
+
+void
+PANEL::wrappedNewLine(int &linecount)
+{
+    linecount++;
+    newLine();
+    if (myH <= 2)
+    {
+	// Cannot scroll with prompt!
+	linecount = 0;
+    }
+    else if (linecount >= myH-2)
+    {
+	awaitKey();
+	linecount = 0;
     }
 }
 
@@ -245,7 +227,7 @@ void redrawWorld();
 void
 PANEL::awaitKey()
 {
-    appendText("-- MORE --\n");
+    appendText(language_is_korean() ? "-- 계속 --\n" : "-- MORE --\n");
     while (!gfx_getKey(false))
     {
 	redrawWorld();
@@ -371,7 +353,7 @@ PANEL::redraw()
 
 		if (x + myX < 0 || x + myX >= SCR_WIDTH)
 		    continue;
-		gfx_printchar(x + myX, y + myY, myLines[y][x], myAttrMap[y][x]);
+		gfx_printcodepoint(x + myX, y + myY, myLines[y][x], myAttrMap[y][x]);
 	    }
 
 	    // Pad with spaces.
@@ -391,9 +373,9 @@ PANEL::redraw()
 	    if (y + myY < 0 || y + myY >= SCR_HEIGHT)
 		continue;
 
-	    if (myX-1 > 0 && myX-1 < SCR_WIDTH)
+	    if (myX-1 >= 0 && myX-1 < SCR_WIDTH)
 		gfx_printchar(myX-1, y + myY, myBorderSym, myBorderAttr);
-	    if (myX+myW > 0 && myX+myW < SCR_WIDTH)
+	    if (myX+myW >= 0 && myX+myW < SCR_WIDTH)
 		gfx_printchar(myX+myW, y + myY, myBorderSym, myBorderAttr);
 	}
 	for (x = -1; x < myW+1; x++)
@@ -401,9 +383,9 @@ PANEL::redraw()
 	    if (x + myX < 0 || x + myX >= SCR_WIDTH)
 		continue;
 
-	    if (myY-1 > 0 && myY-1 < SCR_HEIGHT)
+	    if (myY-1 >= 0 && myY-1 < SCR_HEIGHT)
 		gfx_printchar(x + myX, myY - 1, myBorderSym, myBorderAttr);
-	    if (myY+myH > 0 && myY+myH < SCR_WIDTH)
+	    if (myY+myH >= 0 && myY+myH < SCR_HEIGHT)
 		gfx_printchar(x + myX, myY+myH, myBorderSym, myBorderAttr);
 	}
     }
@@ -429,20 +411,20 @@ PANEL::scrollUp()
 
     if (myRecordHistory)
     {
-	char		*line;
+	unsigned int	*line;
 
 	// It is a sign of an incompetent programmer to have an oversized
 	// overflow like this.  Either you know the behaviour, so can
 	// have an exact bonus, or you don't, so can't really give any
 	// bonus.
-	line = new char [myW+10];
-	memcpy(line, myLines[0], myW+1);
+	line = new unsigned int [myW+1];
+	memcpy(line, myLines[0], (myW+1) * sizeof(unsigned int));
 	myHistory.append(line);
     }
 
     for (y = 1; y < myH; y++)
     {
-	memcpy(myLines[y-1], myLines[y], myW+1);
+	memcpy(myLines[y-1], myLines[y], (myW+1) * sizeof(unsigned int));
 	memcpy(myAttrMap[y-1], myAttrMap[y], myW * sizeof(ATTR_NAMES));
     }
     myLines[myH-1][0] = '\0';
@@ -465,7 +447,7 @@ PANEL::scrollDown()
 
     for (y = myH-1; y >= 1; y--)
     {
-	memcpy(myLines[y], myLines[y-1], myW+1);
+	memcpy(myLines[y], myLines[y-1], (myW+1) * sizeof(unsigned int));
 	memcpy(myAttrMap[y], myAttrMap[y-1], myW * sizeof(ATTR_NAMES));
     }
     for (x = 0; x < myW; x++)
@@ -476,7 +458,7 @@ PANEL::scrollDown()
     // Pull out the history...
     if (myHistory.entries())
     {
-	memcpy(myLines[0], myHistory.top(), myW+1);
+	memcpy(myLines[0], myHistory.top(), (myW+1) * sizeof(unsigned int));
 	delete [] myHistory.pop();
     }
     else

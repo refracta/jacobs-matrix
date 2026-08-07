@@ -201,7 +201,8 @@ void TCOD_console_put_char(TCOD_console_t con,int x, int y, int c, TCOD_bkgnd_fl
 	dat=(TCOD_console_data_t *)con;
 	if ( (unsigned)(x) >= dat->w || (unsigned)(y) >= dat->h ) return;
 	dat->buf[ y * dat->w + x ].c = c;
-	dat->buf[ y * dat->w + x ].cf = ascii_to_tcod[c];
+	dat->buf[ y * dat->w + x ].cf =
+		(c >= 0 && c < TCOD_MAX_FONT_CHARS) ? ascii_to_tcod[c] : ascii_to_tcod[' '];
 	dat->buf[ y * dat->w + x ].fore=dat->fore;
 	TCOD_console_set_back(con,x,y,dat->back,(TCOD_bkgnd_flag_t)flag);
 }
@@ -354,7 +355,8 @@ void TCOD_console_set_char(TCOD_console_t con,int x, int y, int c) {
 	dat=(TCOD_console_data_t *)con;
 	if ( (unsigned)(x) >= dat->w || (unsigned)(y) >= dat->h ) return;
 	dat->buf[ y * dat->w + x ].c=c;
-	dat->buf[ y * dat->w + x ].cf = ascii_to_tcod[c];
+	dat->buf[ y * dat->w + x ].cf =
+		(c >= 0 && c < TCOD_MAX_FONT_CHARS) ? ascii_to_tcod[c] : ascii_to_tcod[' '];
 }
 
 static void TCOD_console_clamp(int cx, int cy, int cw, int ch, int *x, int *y, int *w, int *h) {

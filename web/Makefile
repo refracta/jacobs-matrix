@@ -23,7 +23,7 @@ TCOD_CPP_FILES := \
 APP_CPP_FILES := \
 	ai.cpp buf.cpp chooser.cpp config.cpp dircontrol.cpp display.cpp dpdf.cpp \
 	engine.cpp fire.cpp gfxengine.cpp glbdef.cpp grammar.cpp item.cpp main.cpp \
-	map.cpp mob.cpp msg.cpp panel.cpp rand.cpp scrpos.cpp speed.cpp text.cpp \
+	language.cpp map.cpp mob.cpp msg.cpp panel.cpp rand.cpp scrpos.cpp speed.cpp text.cpp \
 	thread.cpp thread_linux.cpp
 
 TCOD_C_OBJECTS := $(patsubst %.c,$(BUILD_DIR)/tcod-c/%.o,$(TCOD_C_FILES))
@@ -31,12 +31,14 @@ TCOD_CPP_OBJECTS := $(patsubst %.cpp,$(BUILD_DIR)/tcod-cpp/%.o,$(TCOD_CPP_FILES)
 APP_OBJECTS := $(patsubst %.cpp,$(BUILD_DIR)/app/%.o,$(APP_CPP_FILES))
 OBJECTS := $(TCOD_C_OBJECTS) $(TCOD_CPP_OBJECTS) $(APP_OBJECTS)
 DEPS := $(OBJECTS:.o=.d)
+ASSETS := $(ROOT)/src/jacob.cfg $(ROOT)/linux/terminal.png $(ROOT)/music/duegar_requiem.ogg \
+	$(wildcard $(ROOT)/rooms/*.map) $(ROOT)/text.txt $(ROOT)/text_ko.txt
 
 .PHONY: all clean serve
 
 all: $(DIST_DIR)/index.html
 
-$(DIST_DIR)/index.html: $(OBJECTS) shell.html pre.js coi-serviceworker.js COI-SERVICEWORKER-LICENSE.txt
+$(DIST_DIR)/index.html: $(OBJECTS) $(ASSETS) shell.html pre.js coi-serviceworker.js COI-SERVICEWORKER-LICENSE.txt
 	@mkdir -p $(DIST_DIR)
 	$(EMXX) $(OBJECTS) -o $@ \
 		-O2 -pthread $(PORT_FLAGS) \
@@ -57,7 +59,8 @@ $(DIST_DIR)/index.html: $(OBJECTS) shell.html pre.js coi-serviceworker.js COI-SE
 		--preload-file $(ROOT)/linux/terminal.png@/terminal.png \
 		--preload-file $(ROOT)/music@/music \
 		--preload-file $(ROOT)/rooms@/rooms \
-		--preload-file $(ROOT)/text.txt@/text.txt
+		--preload-file $(ROOT)/text.txt@/text.txt \
+		--preload-file $(ROOT)/text_ko.txt@/text_ko.txt
 	cp coi-serviceworker.js COI-SERVICEWORKER-LICENSE.txt $(DIST_DIR)/
 	touch $(DIST_DIR)/.nojekyll
 

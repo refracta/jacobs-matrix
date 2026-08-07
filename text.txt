@@ -125,8 +125,8 @@ game::help
 
      Command Keys:
        f,0 - Cast Spell
-       t,- - Orange Portal
-       g,+ - Blue Portal
+       t,- - Blue Portal
+       g,+ - Orange Portal
        x - Look Around
        m - Map
        w - Change Behaviour

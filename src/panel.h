@@ -78,10 +78,11 @@ public:
     void	 setRigthMargin(int margin);
     
 protected:
+    void	 wrappedNewLine(int &linecount);
     void	 scrollUp();
     void	 scrollDown();
 
-    char	**myLines;
+    unsigned int **myLines;
     int		 myX, myY, myW, myH;
     int		 myCurLine, myCurPos;
     int		 myIndent, myRightMargin;
@@ -96,8 +97,7 @@ protected:
     ATTR_NAMES	 myTextAttr;
 
     bool		myRecordHistory;
-    PTRLIST<char *>	myHistory;
+    PTRLIST<unsigned int *>	myHistory;
 };
 
 #endif
-

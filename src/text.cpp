@@ -18,9 +18,12 @@ using namespace std;
 #include "ptrlist.h"
 #include "grammar.h"
 #include "rand.h"
+#include "language.h"
 
 PTRLIST<char *> glbTextEntry;
 PTRLIST<char *> glbTextKey;
+PTRLIST<char *> glbKoreanTextEntry;
+PTRLIST<char *> glbKoreanTextKey;
 
 char *
 text_append(char *oldtxt, const char *append)
@@ -91,10 +94,10 @@ text_lastnonws(const char *line)
     return i;
 }
 
-void
-text_init()
+static void
+text_load(const char *filename, PTRLIST<char *> &keys, PTRLIST<char *> &entries)
 {
-    ifstream	is("../text.txt");
+    ifstream	is(filename);
     char	line[500];
     bool	hasline = false;
     char	*text;
@@ -112,7 +115,7 @@ text_init()
 	if (!ISSPACE(line[0]))
 	{
 	    // This line is a key.
-	    glbTextKey.append(strdup(line));
+	    keys.append(strdup(line));
 	    // Rest is the message...
 	    text = strdup("");
 	    while (is.getline(line, 500))
@@ -156,9 +159,21 @@ text_init()
 	    }
 
 	    // Append the resulting text.
-	    glbTextEntry.append(text);
+	    entries.append(text);
 	}
     }
+}
+
+void
+text_init()
+{
+#ifdef __EMSCRIPTEN__
+    text_load("/text.txt", glbTextKey, glbTextEntry);
+    text_load("/text_ko.txt", glbKoreanTextKey, glbKoreanTextEntry);
+#else
+    text_load("../text.txt", glbTextKey, glbTextEntry);
+    text_load("../text_ko.txt", glbKoreanTextKey, glbKoreanTextEntry);
+#endif
 }
 
 void
@@ -171,21 +186,44 @@ text_shutdown()
 	free(glbTextKey(i));
 	free(glbTextEntry(i));
     }
+
+    for (i = 0; i < glbKoreanTextKey.entries(); i++)
+    {
+	free(glbKoreanTextKey(i));
+	free(glbKoreanTextEntry(i));
+    }
+}
+
+static const char *
+text_find(const char *key, PTRLIST<char *> &keys, PTRLIST<char *> &entries)
+{
+    int i;
+
+    for (i = 0; i < keys.entries(); i++)
+    {
+	if (!strcmp(key, keys(i)))
+	    return entries(i);
+    }
+
+    return 0;
 }
 
 BUF
 text_lookup(const char *key)
 {
     BUF		 buf;
-    int		i;
+    const char *entry = 0;
 
-    for (i = 0; i < glbTextKey.entries(); i++)
+    if (language_is_korean())
+	entry = text_find(key, glbKoreanTextKey, glbKoreanTextEntry);
+
+    if (!entry)
+	entry = text_find(key, glbTextKey, glbTextEntry);
+
+    if (entry)
     {
-	if (!strcmp(key, glbTextKey(i)))
-	{
-	    buf.reference(glbTextEntry(i));
-	    return buf;
-	}
+	buf.reference(entry);
+	return buf;
     }
 
     buf.sprintf("Missing text entry: \"%s\".", key);

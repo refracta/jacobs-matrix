@@ -70,6 +70,9 @@ bool gfx_cookDir(int &key, int &dx, int &dy, GFX_Cookdir cookdir = GFX_COOKDIR_A
 void gfx_getString(int x, int y, ATTR_NAMES attr, char *buf, int maxlen);
 
 void gfx_printchar(int x, int y, u8 c, ATTR_NAMES attr);
+void gfx_printcodepoint(int x, int y, unsigned int c, ATTR_NAMES attr);
+unsigned int gfx_utf8next(const char **text);
+int gfx_utf8width(const char *text);
 // Uses black background.
 void gfx_printchar(int x, int y, u8 c, u8 r, u8 g, u8 b);
 // Fully specify

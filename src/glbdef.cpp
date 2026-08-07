@@ -3167,6 +3167,9 @@ glb_optiondefs[NUM_OPTIONS] =
     "Play",
   },
   {
+    "Language",
+  },
+  {
     "Volume",
   },
   {

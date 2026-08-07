@@ -17,6 +17,7 @@
 #include "text.h"
 #include "speed.h"
 #include "item.h"
+#include "language.h"
 
 #include <iostream>
 using namespace std;
@@ -439,24 +440,37 @@ MOB::viewDescription() const
     char	buf[100];
     int		min, q1, q2, q3, max;
 
-    sprintf(buf, "Name: %s\n", getName());
+    if (language_is_korean())
+	sprintf(buf, "이름: %s\n", language_text(getName()));
+    else
+	sprintf(buf, "Name: %s\n", getName());
     msg_report(buf);
 
-    sprintf(buf, "Health: %d\n", getHP());
+    if (language_is_korean())
+	sprintf(buf, "체력: %d\n", getHP());
+    else
+	sprintf(buf, "Health: %d\n", getHP());
     msg_report(buf);
 
     getMeleeDPDF().getQuartile(min, q1, q2, q3, max);
-    sprintf(buf, "Melee Weapon: %s (%d..%d..%d..%d..%d)\n",
-		defn().melee_name,
-		min, q1, q2, q3, max);
+    if (language_is_korean())
+	sprintf(buf, "근접 무기: %s (%d..%d..%d..%d..%d)\n",
+		language_text(defn().melee_name), min, q1, q2, q3, max);
+    else
+	sprintf(buf, "Melee Weapon: %s (%d..%d..%d..%d..%d)\n",
+		defn().melee_name, min, q1, q2, q3, max);
     msg_report(buf);
 
     if (defn().range_valid)
     {
 	getRangedDPDF().getQuartile(min, q1, q2, q3, max);
-	sprintf(buf, "Ranged Weapon: %s (%d..%d..%d..%d..%d), Range %d\n",
-		    defn().range_name,
-		    min, q1, q2, q3, max,
+	if (language_is_korean())
+	    sprintf(buf, "원거리 무기: %s (%d..%d..%d..%d..%d), 사거리 %d\n",
+		    language_text(defn().range_name), min, q1, q2, q3, max,
+		    getRangedRange());
+	else
+	    sprintf(buf, "Ranged Weapon: %s (%d..%d..%d..%d..%d), Range %d\n",
+		    defn().range_name, min, q1, q2, q3, max,
 		    getRangedRange());
 	msg_report(buf);
     }

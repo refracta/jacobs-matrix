@@ -29,7 +29,7 @@
         radial-gradient(circle at 50% 15%, #192130 0, #0b0f16 38rem, #06080c 100%);
     }
     main {
-      width: min(100%, 1024px);
+      width: min(100%, 1344px);
       padding: 24px 16px 32px;
       text-align: center;
     }
@@ -47,7 +47,7 @@
     }
     .screen {
       position: relative;
-      width: min(100%, 960px);
+      width: min(100%, 1280px);
       aspect-ratio: 8 / 5;
       margin: 0 auto;
       overflow: hidden;
@@ -63,6 +63,12 @@
       outline: none;
       image-rendering: pixelated;
       image-rendering: crisp-edges;
+    }
+    #unicode-canvas {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      image-rendering: auto;
     }
     #loading {
       position: absolute;
@@ -105,22 +111,33 @@
       color: #dce2ec;
       font: inherit;
     }
+    .source-links {
+      margin: 8px 0 0;
+      color: #697486;
+      font-size: .74rem;
+    }
+    .source-links a { color: #aab6c8; }
   </style>
 </head>
 <body>
   <main>
     <h1>Jacob's Matrix</h1>
-    <p class="subtitle">Release 004 · multithreaded WebAssembly port</p>
+    <p class="subtitle" id="page-subtitle">Release 004 · multithreaded WebAssembly port</p>
     <div class="screen">
       <canvas id="canvas" width="640" height="400" tabindex="0" aria-label="Jacob's Matrix game"></canvas>
+      <canvas id="unicode-canvas" width="1280" height="800" aria-hidden="true"></canvas>
       <div id="loading" role="status" aria-live="polite">
         <div class="spinner" aria-hidden="true"></div>
         <div id="status">Preparing multithreaded WebAssembly…</div>
       </div>
     </div>
-    <p class="help">
+    <p class="help" id="page-help">
       Click the game, then use <kbd>Arrow keys</kbd> and <kbd>Enter</kbd>.
       Press <kbd>?</kbd> in game for full controls. Audio starts after keyboard input.
+    </p>
+    <p class="source-links">
+      <a id="original-link" href="http://www.zincland.com/7drl/jacob/" target="_blank" rel="noreferrer">Original 7DRL page</a>
+      · <a id="repository-link" href="https://github.com/refracta/jacobs-matrix" target="_blank" rel="noreferrer">GitHub repository</a>
     </p>
   </main>
 
@@ -132,8 +149,58 @@
   <script>
     (function () {
       var canvas = document.getElementById("canvas");
+      var unicodeCanvas = document.getElementById("unicode-canvas");
       var loading = document.getElementById("loading");
       var status = document.getElementById("status");
+
+      window.__jacobSetLanguage = function (korean) {
+        document.documentElement.lang = korean ? "ko" : "en";
+        document.getElementById("page-subtitle").textContent = korean
+          ? "릴리스 004 · 멀티스레드 WebAssembly 포트"
+          : "Release 004 · multithreaded WebAssembly port";
+        document.getElementById("page-help").innerHTML = korean
+          ? "게임 화면을 클릭한 뒤 <kbd>방향키</kbd>와 <kbd>Enter</kbd>를 사용하세요. 게임 중 <kbd>?</kbd>를 누르면 전체 조작법을 볼 수 있습니다. 키를 입력하면 음악이 시작됩니다."
+          : "Click the game, then use <kbd>Arrow keys</kbd> and <kbd>Enter</kbd>. Press <kbd>?</kbd> in game for full controls. Audio starts after keyboard input.";
+        document.getElementById("original-link").textContent = korean ? "원작 7DRL 페이지" : "Original 7DRL page";
+        document.getElementById("repository-link").textContent = korean ? "GitHub 저장소" : "GitHub repository";
+      };
+
+      window.__jacobDrawUnicode = function (pointer, width, height, cellSize,
+          charOffset, colorOffset, cellWidth, cellHeight, fade, fadeRed,
+          fadeGreen, fadeBlue) {
+        var context = unicodeCanvas.getContext("2d");
+        var scaleX = unicodeCanvas.width / (width * cellWidth);
+        var scaleY = unicodeCanvas.height / (height * cellHeight);
+        context.clearRect(0, 0, unicodeCanvas.width, unicodeCanvas.height);
+        context.save();
+        var fontFamily = "'Malgun Gothic', 'Apple SD Gothic Neo', 'NanumGothic', 'Noto Sans CJK KR', sans-serif";
+        context.font = "500 " + Math.floor(cellHeight * scaleY * 0.875) + "px " + fontFamily;
+        context.textAlign = "center";
+        context.textBaseline = "middle";
+
+        for (var y = 0; y < height; y++) {
+          for (var x = 0; x < width; x++) {
+            var address = pointer + (x + y * width) * cellSize;
+            var codepoint = HEAP32[(address + charOffset) >> 2];
+            if (codepoint <= 255) continue;
+            if (codepoint > 0x10ffff || (codepoint >= 0xd800 && codepoint <= 0xdfff)) {
+              codepoint = 0xfffd;
+            }
+
+            var red = HEAPU8[address + colorOffset];
+            var green = HEAPU8[address + colorOffset + 1];
+            var blue = HEAPU8[address + colorOffset + 2];
+            red = red * fade / 255 + fadeRed * (255 - fade) / 255;
+            green = green * fade / 255 + fadeGreen * (255 - fade) / 255;
+            blue = blue * fade / 255 + fadeBlue * (255 - fade) / 255;
+            context.fillStyle = "rgb(" + red + "," + green + "," + blue + ")";
+            context.fillText(String.fromCodePoint(codepoint),
+              (x * cellWidth + cellWidth / 2) * scaleX,
+              (y * cellHeight + cellHeight / 2) * scaleY);
+          }
+        }
+        context.restore();
+      };
 
       function setStatus(message) {
         status.textContent = message || "Loading…";

@@ -60,7 +60,7 @@ CHOOSER::clear()
 int
 CHOOSER::appendChoice(const char *choice, int percent)
 {
-    myW = MAX(strlen(choice) + myIndent + myRightMargin, myW);
+    myW = MAX(gfx_utf8width(choice) + myIndent + myRightMargin, myW);
     myChoices.append(strdup(choice));
     myPercent.append(percent);
     myAttr.append(myTextAttr);
@@ -145,11 +145,13 @@ CHOOSER::redraw() const
 
     for (y = 0; y < height(); y++)
     {
+	const char *choice = myChoices(y);
+	int choicepos = 0;
 	sy = y + yoff;
 	if (sy < 0 || sy >= SCR_HEIGHT)
 	    continue;
 
-	clen = strlen(myChoices(y));
+	clen = gfx_utf8width(myChoices(y));
 	perlen = 0;
 	if (myPercent(y))
 	{
@@ -157,9 +159,8 @@ CHOOSER::redraw() const
 	}
 	for (x = 0; x < width(); x++)
 	{
+	    unsigned int codepoint = ' ';
 	    sx = x + xoff;
-	    if (sx < 0 || sx >= SCR_WIDTH)
-		continue;
 
 	    attr = myAttr(y);
 	    if (getChoice() == y)
@@ -167,13 +168,18 @@ CHOOSER::redraw() const
 	    if (x < perlen)
 		attr = myPercentAttr;
 
-	    // Indents...
-	    if (x < myIndent)
-		gfx_printchar(x+xoff, y+yoff, ' ', attr);
-	    else if (x-myIndent < clen)
-		gfx_printchar(x+xoff, y+yoff, myChoices(y)[x-myIndent], attr);
-	    else
-		gfx_printchar(x+xoff, y+yoff, ' ', attr);
+	    if (x >= myIndent && choicepos < clen)
+	    {
+		codepoint = gfx_utf8next(&choice);
+		choicepos++;
+	    }
+
+	    // Advance the UTF-8 stream even when the chooser is clipped on the
+	    // left; otherwise the first visible cell incorrectly repeats column 0.
+	    if (sx < 0 || sx >= SCR_WIDTH)
+		continue;
+
+	    gfx_printcodepoint(sx, sy, codepoint, attr);
 	}
     }
 
@@ -184,9 +190,9 @@ CHOOSER::redraw() const
 	    if (y + yoff < 0 || y + yoff >= SCR_HEIGHT)
 		continue;
 
-	    if (xoff-1 > 0 && xoff-1 < SCR_WIDTH)
+	    if (xoff-1 >= 0 && xoff-1 < SCR_WIDTH)
 		gfx_printchar(xoff-1, y + yoff, myBorderSym, myBorderAttr);
-	    if (xoff+myW > 0 && xoff+myW < SCR_WIDTH)
+	    if (xoff+myW >= 0 && xoff+myW < SCR_WIDTH)
 		gfx_printchar(xoff+myW, y + yoff, myBorderSym, myBorderAttr);
 	}
 	for (x = -1; x < myW+1; x++)
@@ -194,9 +200,9 @@ CHOOSER::redraw() const
 	    if (x + xoff < 0 || x + xoff >= SCR_WIDTH)
 		continue;
 
-	    if (yoff-1 > 0 && yoff-1 < SCR_HEIGHT)
+	    if (yoff-1 >= 0 && yoff-1 < SCR_HEIGHT)
 		gfx_printchar(x + xoff, yoff - 1, myBorderSym, myBorderAttr);
-	    if (yoff+myH > 0 && yoff+myH < SCR_WIDTH)
+	    if (yoff+myH >= 0 && yoff+myH < SCR_HEIGHT)
 		gfx_printchar(x + xoff, yoff+myH, myBorderSym, myBorderAttr);
 	}
     }

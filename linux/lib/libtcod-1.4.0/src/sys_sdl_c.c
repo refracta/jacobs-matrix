@@ -29,8 +29,17 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
+#include <stddef.h>
 #include "libtcod.h"
 #include "libtcod_int.h"
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+/* Emscripten's C headers define C99 bool/true/false macros.  libtcod 1.4
+ * predates stdbool and provides its own ABI-visible enum instead. */
+#undef bool
+#undef true
+#undef false
+#endif
 
 // image support stuff
 bool TCOD_sys_check_bmp(const char *filename);
@@ -664,6 +673,20 @@ void TCOD_sys_flush(bool render) {
 	if ( render ) {
 		TCOD_sys_console_to_bitmap(screen,TCOD_console_get_width(NULL),TCOD_console_get_height(NULL),consoleBuffer, prevConsoleBuffer);
 		SDL_Flip(screen);
+#ifdef __EMSCRIPTEN__
+		/* The bitmap font is ASCII-only.  Draw UTF-8 codepoints recorded in
+		 * console cells with the browser's Korean-capable system font after
+		 * SDL has copied the base pixels to the canvas. */
+		MAIN_THREAD_EM_ASM({
+			if (globalThis.__jacobDrawUnicode) {
+				globalThis.__jacobDrawUnicode($0, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11);
+			}
+		}, consoleBuffer, consoleWidth, consoleHeight, sizeof(char_t),
+		   offsetof(char_t, c), offsetof(char_t, fore), fontWidth, fontHeight,
+		   TCOD_console_get_fade(), TCOD_console_get_fading_color().r,
+		   TCOD_console_get_fading_color().g,
+		   TCOD_console_get_fading_color().b);
+#endif
 	}
 	old_time=new_time;
 	new_time=TCOD_sys_elapsed_milli();

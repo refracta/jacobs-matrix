@@ -11,6 +11,7 @@
  */
 
 #include "item.h"
+#include "language.h"
 
 #include <assert.h>
 
@@ -261,6 +262,39 @@ ITEM::getName() const
 {
     BUF		buf;
 
+    if (language_is_korean())
+    {
+	BUF result;
+	switch (getDefinition())
+	{
+	    case ITEM_WEAPON:
+		buf.sprintf("%s %s %s",
+			language_text(glb_weapon_modifierdefs[myModifier].name),
+			language_text(glb_weapon_materialdefs[myMaterial].name),
+			language_text(glb_weapon_typedefs[myType].name));
+		break;
+	    case ITEM_SPELLBOOK:
+		buf.sprintf("%s %s %s 마법책",
+			language_text(glb_book_materialdefs[myMaterial].name),
+			language_text(glb_book_elementdefs[myModifier].name),
+			language_text(glb_book_typedefs[myType].name));
+		break;
+	    default:
+		if (getTimer() >= 0)
+		    buf.sprintf("%s (%d)", language_text(defn().name), getTimer());
+		else
+		    buf.strcpy(language_text(defn().name));
+		break;
+	}
+
+	if (myCount != 1)
+	{
+	    result.sprintf("%s %d개", buf.buffer(), myCount);
+	    return result;
+	}
+	return buf;
+    }
+
     // Handle special cases.
     switch (getDefinition())
     {
@@ -317,7 +351,11 @@ ITEM::getDetailedDescription() const
 	    damage.getQuartile(min, q1, q2, q3, max);
 
 	    getWeaponStats(p, a, c);
-	    buf.sprintf("Accuracy: %d\nDamage: \n%d..%d..%d..%d..%d\n",
+	    if (language_is_korean())
+		buf.sprintf("명중률: %d\n피해량: \n%d..%d..%d..%d..%d\n",
+			    a, min, q1, q2, q3, max);
+	    else
+		buf.sprintf("Accuracy: %d\nDamage: \n%d..%d..%d..%d..%d\n",
 			    a, min, q1, q2, q3, max);
 	    return buf;
 	}
@@ -332,12 +370,18 @@ ITEM::getDetailedDescription() const
 	    damage.getQuartile(min, q1, q2, q3, max);
 
 	    getRangeStats(r, p, c, a, m);
-	    buf.sprintf(
-		        "Area: %d Range: %d\n"
-		        "Mana: %d\n"	
-		        "Damage:\n%d..%d..%d..%d..%d\n",
-			    a, r, m,
-			    min, q1, q2, q3, max);
+	    if (language_is_korean())
+		buf.sprintf(
+			    "범위: %d 사거리: %d\n"
+			    "마나: %d\n"
+			    "피해량:\n%d..%d..%d..%d..%d\n",
+			    a, r, m, min, q1, q2, q3, max);
+	    else
+		buf.sprintf(
+			    "Area: %d Range: %d\n"
+			    "Mana: %d\n"
+			    "Damage:\n%d..%d..%d..%d..%d\n",
+			    a, r, m, min, q1, q2, q3, max);
 	    return buf;
 	}
 	default:
