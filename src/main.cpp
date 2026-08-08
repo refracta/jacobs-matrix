@@ -404,10 +404,7 @@ redrawWorld()
 	    glbDeathInfo->clear();
 	    glbDeathInfo->fillRect(0, 0, 30, 1, ATTR_NORMAL);
 	    glbDeathInfo->appendText(language_text(" Dead, awaiting revival... "));
-	    // A moving bar beneath very small anti-aliased Hangul looks like shimmer.
-	    // Keep the Korean label stable; retain the original animation in English.
-	    if (!language_is_korean())
-		glbDeathInfo->fillRect(0, 0, (int)(percent * 30), 1, ATTR_DEATHBAR);
+	    glbDeathInfo->fillRect(0, 0, (int)(percent * 30), 1, ATTR_DEATHBAR);
 	}
     }
     
