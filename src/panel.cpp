@@ -227,11 +227,21 @@ void redrawWorld();
 void
 PANEL::awaitKey()
 {
-    appendText(language_is_korean() ? "-- 계속 --\n" : "-- MORE --\n");
+    int moreline = myCurLine;
+    int morepos = myCurPos;
+
+    // Draw the pagination prompt on the otherwise empty current line.  Do
+    // not add a newline: after the keypress we erase this temporary text so
+    // it cannot remain embedded in the following page.
+    appendText(language_is_korean() ? "-- 계속 --" : "-- MORE --");
     while (!gfx_getKey(false))
     {
 	redrawWorld();
     }
+
+    myLines[moreline][morepos] = 0;
+    myCurLine = moreline;
+    myCurPos = morepos;
 }
 
 void
